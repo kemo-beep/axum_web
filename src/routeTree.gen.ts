@@ -9,11 +9,19 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as TermsRouteImport } from './routes/terms'
 import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as RegisterRouteImport } from './routes/register'
+import { Route as PrivacyRouteImport } from './routes/privacy'
+import { Route as PricingRouteImport } from './routes/pricing'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as ForgotPasswordRouteImport } from './routes/forgot-password'
 import { Route as DashboardRouteImport } from './routes/dashboard'
+import { Route as CookiesRouteImport } from './routes/cookies'
+import { Route as ContactRouteImport } from './routes/contact'
+import { Route as ChangelogRouteImport } from './routes/changelog'
+import { Route as CareersRouteImport } from './routes/careers'
+import { Route as BlogRouteImport } from './routes/blog'
 import { Route as ApiKeysRouteImport } from './routes/api-keys'
 import { Route as AboutRouteImport } from './routes/about'
 import { Route as IndexRouteImport } from './routes/index'
@@ -23,6 +31,11 @@ import { Route as InvitesAcceptRouteImport } from './routes/invites/accept'
 import { Route as BillingPortalRouteImport } from './routes/billing/portal'
 import { Route as BillingPlansRouteImport } from './routes/billing/plans'
 
+const TermsRoute = TermsRouteImport.update({
+  id: '/terms',
+  path: '/terms',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ResetPasswordRoute = ResetPasswordRouteImport.update({
   id: '/reset-password',
   path: '/reset-password',
@@ -31,6 +44,16 @@ const ResetPasswordRoute = ResetPasswordRouteImport.update({
 const RegisterRoute = RegisterRouteImport.update({
   id: '/register',
   path: '/register',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PrivacyRoute = PrivacyRouteImport.update({
+  id: '/privacy',
+  path: '/privacy',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PricingRoute = PricingRouteImport.update({
+  id: '/pricing',
+  path: '/pricing',
   getParentRoute: () => rootRouteImport,
 } as any)
 const LoginRoute = LoginRouteImport.update({
@@ -46,6 +69,31 @@ const ForgotPasswordRoute = ForgotPasswordRouteImport.update({
 const DashboardRoute = DashboardRouteImport.update({
   id: '/dashboard',
   path: '/dashboard',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CookiesRoute = CookiesRouteImport.update({
+  id: '/cookies',
+  path: '/cookies',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ContactRoute = ContactRouteImport.update({
+  id: '/contact',
+  path: '/contact',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ChangelogRoute = ChangelogRouteImport.update({
+  id: '/changelog',
+  path: '/changelog',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CareersRoute = CareersRouteImport.update({
+  id: '/careers',
+  path: '/careers',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const BlogRoute = BlogRouteImport.update({
+  id: '/blog',
+  path: '/blog',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ApiKeysRoute = ApiKeysRouteImport.update({
@@ -93,11 +141,19 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
   '/api-keys': typeof ApiKeysRoute
+  '/blog': typeof BlogRoute
+  '/careers': typeof CareersRoute
+  '/changelog': typeof ChangelogRoute
+  '/contact': typeof ContactRoute
+  '/cookies': typeof CookiesRoute
   '/dashboard': typeof DashboardRoute
   '/forgot-password': typeof ForgotPasswordRoute
   '/login': typeof LoginRoute
+  '/pricing': typeof PricingRoute
+  '/privacy': typeof PrivacyRoute
   '/register': typeof RegisterRoute
   '/reset-password': typeof ResetPasswordRoute
+  '/terms': typeof TermsRoute
   '/billing/plans': typeof BillingPlansRoute
   '/billing/portal': typeof BillingPortalRoute
   '/invites/accept': typeof InvitesAcceptRoute
@@ -108,11 +164,19 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
   '/api-keys': typeof ApiKeysRoute
+  '/blog': typeof BlogRoute
+  '/careers': typeof CareersRoute
+  '/changelog': typeof ChangelogRoute
+  '/contact': typeof ContactRoute
+  '/cookies': typeof CookiesRoute
   '/dashboard': typeof DashboardRoute
   '/forgot-password': typeof ForgotPasswordRoute
   '/login': typeof LoginRoute
+  '/pricing': typeof PricingRoute
+  '/privacy': typeof PrivacyRoute
   '/register': typeof RegisterRoute
   '/reset-password': typeof ResetPasswordRoute
+  '/terms': typeof TermsRoute
   '/billing/plans': typeof BillingPlansRoute
   '/billing/portal': typeof BillingPortalRoute
   '/invites/accept': typeof InvitesAcceptRoute
@@ -124,11 +188,19 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
   '/api-keys': typeof ApiKeysRoute
+  '/blog': typeof BlogRoute
+  '/careers': typeof CareersRoute
+  '/changelog': typeof ChangelogRoute
+  '/contact': typeof ContactRoute
+  '/cookies': typeof CookiesRoute
   '/dashboard': typeof DashboardRoute
   '/forgot-password': typeof ForgotPasswordRoute
   '/login': typeof LoginRoute
+  '/pricing': typeof PricingRoute
+  '/privacy': typeof PrivacyRoute
   '/register': typeof RegisterRoute
   '/reset-password': typeof ResetPasswordRoute
+  '/terms': typeof TermsRoute
   '/billing/plans': typeof BillingPlansRoute
   '/billing/portal': typeof BillingPortalRoute
   '/invites/accept': typeof InvitesAcceptRoute
@@ -141,11 +213,19 @@ export interface FileRouteTypes {
     | '/'
     | '/about'
     | '/api-keys'
+    | '/blog'
+    | '/careers'
+    | '/changelog'
+    | '/contact'
+    | '/cookies'
     | '/dashboard'
     | '/forgot-password'
     | '/login'
+    | '/pricing'
+    | '/privacy'
     | '/register'
     | '/reset-password'
+    | '/terms'
     | '/billing/plans'
     | '/billing/portal'
     | '/invites/accept'
@@ -156,11 +236,19 @@ export interface FileRouteTypes {
     | '/'
     | '/about'
     | '/api-keys'
+    | '/blog'
+    | '/careers'
+    | '/changelog'
+    | '/contact'
+    | '/cookies'
     | '/dashboard'
     | '/forgot-password'
     | '/login'
+    | '/pricing'
+    | '/privacy'
     | '/register'
     | '/reset-password'
+    | '/terms'
     | '/billing/plans'
     | '/billing/portal'
     | '/invites/accept'
@@ -171,11 +259,19 @@ export interface FileRouteTypes {
     | '/'
     | '/about'
     | '/api-keys'
+    | '/blog'
+    | '/careers'
+    | '/changelog'
+    | '/contact'
+    | '/cookies'
     | '/dashboard'
     | '/forgot-password'
     | '/login'
+    | '/pricing'
+    | '/privacy'
     | '/register'
     | '/reset-password'
+    | '/terms'
     | '/billing/plans'
     | '/billing/portal'
     | '/invites/accept'
@@ -187,11 +283,19 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AboutRoute: typeof AboutRoute
   ApiKeysRoute: typeof ApiKeysRoute
+  BlogRoute: typeof BlogRoute
+  CareersRoute: typeof CareersRoute
+  ChangelogRoute: typeof ChangelogRoute
+  ContactRoute: typeof ContactRoute
+  CookiesRoute: typeof CookiesRoute
   DashboardRoute: typeof DashboardRoute
   ForgotPasswordRoute: typeof ForgotPasswordRoute
   LoginRoute: typeof LoginRoute
+  PricingRoute: typeof PricingRoute
+  PrivacyRoute: typeof PrivacyRoute
   RegisterRoute: typeof RegisterRoute
   ResetPasswordRoute: typeof ResetPasswordRoute
+  TermsRoute: typeof TermsRoute
   BillingPlansRoute: typeof BillingPlansRoute
   BillingPortalRoute: typeof BillingPortalRoute
   InvitesAcceptRoute: typeof InvitesAcceptRoute
@@ -201,6 +305,13 @@ export interface RootRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/terms': {
+      id: '/terms'
+      path: '/terms'
+      fullPath: '/terms'
+      preLoaderRoute: typeof TermsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/reset-password': {
       id: '/reset-password'
       path: '/reset-password'
@@ -213,6 +324,20 @@ declare module '@tanstack/react-router' {
       path: '/register'
       fullPath: '/register'
       preLoaderRoute: typeof RegisterRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/privacy': {
+      id: '/privacy'
+      path: '/privacy'
+      fullPath: '/privacy'
+      preLoaderRoute: typeof PrivacyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/pricing': {
+      id: '/pricing'
+      path: '/pricing'
+      fullPath: '/pricing'
+      preLoaderRoute: typeof PricingRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/login': {
@@ -234,6 +359,41 @@ declare module '@tanstack/react-router' {
       path: '/dashboard'
       fullPath: '/dashboard'
       preLoaderRoute: typeof DashboardRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/cookies': {
+      id: '/cookies'
+      path: '/cookies'
+      fullPath: '/cookies'
+      preLoaderRoute: typeof CookiesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/contact': {
+      id: '/contact'
+      path: '/contact'
+      fullPath: '/contact'
+      preLoaderRoute: typeof ContactRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/changelog': {
+      id: '/changelog'
+      path: '/changelog'
+      fullPath: '/changelog'
+      preLoaderRoute: typeof ChangelogRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/careers': {
+      id: '/careers'
+      path: '/careers'
+      fullPath: '/careers'
+      preLoaderRoute: typeof CareersRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/blog': {
+      id: '/blog'
+      path: '/blog'
+      fullPath: '/blog'
+      preLoaderRoute: typeof BlogRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/api-keys': {
@@ -299,11 +459,19 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AboutRoute: AboutRoute,
   ApiKeysRoute: ApiKeysRoute,
+  BlogRoute: BlogRoute,
+  CareersRoute: CareersRoute,
+  ChangelogRoute: ChangelogRoute,
+  ContactRoute: ContactRoute,
+  CookiesRoute: CookiesRoute,
   DashboardRoute: DashboardRoute,
   ForgotPasswordRoute: ForgotPasswordRoute,
   LoginRoute: LoginRoute,
+  PricingRoute: PricingRoute,
+  PrivacyRoute: PrivacyRoute,
   RegisterRoute: RegisterRoute,
   ResetPasswordRoute: ResetPasswordRoute,
+  TermsRoute: TermsRoute,
   BillingPlansRoute: BillingPlansRoute,
   BillingPortalRoute: BillingPortalRoute,
   InvitesAcceptRoute: InvitesAcceptRoute,

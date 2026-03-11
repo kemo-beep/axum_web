@@ -23,7 +23,10 @@ export function CreateOrgForm({ onCreated, onError }: CreateOrgFormProps) {
     try {
       const org = await apiFetch<Org>('/v1/orgs', {
         method: 'POST',
-        body: JSON.stringify({ name: name.trim(), slug: slug.trim() || undefined }),
+        body: JSON.stringify({
+          name: name.trim(),
+          slug: slug.trim() || undefined,
+        }),
       })
       toast.success('Organization created')
       onCreated(org)

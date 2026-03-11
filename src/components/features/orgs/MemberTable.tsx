@@ -15,9 +15,7 @@ interface MemberTableProps {
 
 export function MemberTable({ members }: MemberTableProps) {
   if (members.length === 0) {
-    return (
-      <p className="text-sm text-[var(--sea-ink-soft)]">No members yet.</p>
-    )
+    return <p className="text-sm text-[var(--sea-ink-soft)]">No members yet.</p>
   }
 
   return (

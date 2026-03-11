@@ -17,12 +17,12 @@ Guidance for keeping the frontend clean, componentized, and scalable in this Tan
 
 ### Naming Conventions
 
-| Type        | Convention      | Example                    |
-|-------------|-----------------|----------------------------|
-| Components  | PascalCase      | `UserProfile.tsx`          |
+| Type        | Convention      | Example                        |
+| ----------- | --------------- | ------------------------------ |
+| Components  | PascalCase      | `UserProfile.tsx`              |
 | Hooks       | camelCase + use | `useAuth.ts`, `useUserForm.ts` |
-| Utils       | camelCase       | `formatDate.ts`            |
-| Route files | route path      | `index.tsx`, `about.tsx`   |
+| Utils       | camelCase       | `formatDate.ts`                |
+| Route files | route path      | `index.tsx`, `about.tsx`       |
 
 ### File Layout
 

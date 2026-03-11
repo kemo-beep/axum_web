@@ -64,7 +64,9 @@ export function RegisterForm({ onSuccess, onError }: RegisterFormProps) {
           minLength={8}
           className="h-11"
         />
-        <p className="text-xs text-[var(--sea-ink-soft)]">At least 8 characters</p>
+        <p className="text-xs text-[var(--sea-ink-soft)]">
+          At least 8 characters
+        </p>
       </div>
       <Button
         type="submit"

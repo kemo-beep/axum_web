@@ -31,7 +31,7 @@ export function ApiKeyTable({ keys, onRotated }: ApiKeyTableProps) {
     mutationFn: (id: string) =>
       apiFetch<{ id: string; name: string; key: string }>(
         `/v1/auth/api-keys/${id}/rotate`,
-        { method: 'POST' }
+        { method: 'POST' },
       ),
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ['api-keys'] })
@@ -71,7 +71,11 @@ export function ApiKeyTable({ keys, onRotated }: ApiKeyTableProps) {
           <TableRow key={k.id}>
             <TableCell>{k.name}</TableCell>
             <TableCell>
-              {k.org_id ? `Org: ${k.org_id}` : k.workspace_id ? `Workspace` : 'User'}
+              {k.org_id
+                ? `Org: ${k.org_id}`
+                : k.workspace_id
+                  ? `Workspace`
+                  : 'User'}
             </TableCell>
             <TableCell>
               <span className="text-xs">

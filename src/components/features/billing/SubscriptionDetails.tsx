@@ -22,8 +22,7 @@ function formatDate(iso: string | null): string {
       month: 'short',
       day: 'numeric',
     })
-  }
-  catch {
+  } catch {
     return '—'
   }
 }
@@ -61,7 +60,9 @@ export function SubscriptionDetails({
   onChangePlan,
 }: SubscriptionDetailsProps) {
   const queryClient = useQueryClient()
-  const [changePlanLoading, setChangePlanLoading] = useState<string | null>(null)
+  const [changePlanLoading, setChangePlanLoading] = useState<string | null>(
+    null,
+  )
 
   const changePlanMutation = useMutation({
     mutationFn: (priceId: string) =>
@@ -70,7 +71,7 @@ export function SubscriptionDetails({
         {
           method: 'POST',
           body: JSON.stringify({ price_id: priceId }),
-        }
+        },
       ),
     onSuccess: () => {
       setChangePlanLoading(null)
@@ -90,9 +91,15 @@ export function SubscriptionDetails({
   const currentAmountCents = currentPlan?.amount_cents ?? 0
 
   // Sort plans by amount to find next upper and lower tier
-  const sortedByAmount = [...plans].sort((a, b) => a.amount_cents - b.amount_cents)
-  const nextUpperPlan = sortedByAmount.find((p) => p.amount_cents > currentAmountCents)
-  const nextLowerPlan = [...sortedByAmount].reverse().find((p) => p.amount_cents < currentAmountCents)
+  const sortedByAmount = [...plans].sort(
+    (a, b) => a.amount_cents - b.amount_cents,
+  )
+  const nextUpperPlan = sortedByAmount.find(
+    (p) => p.amount_cents > currentAmountCents,
+  )
+  const nextLowerPlan = [...sortedByAmount]
+    .reverse()
+    .find((p) => p.amount_cents < currentAmountCents)
   const hasUpgradeOrDowngrade = nextUpperPlan != null || nextLowerPlan != null
 
   return (
@@ -118,7 +125,12 @@ export function SubscriptionDetails({
                     style: 'currency',
                     currency: (currentPlan.currency || 'usd').toUpperCase(),
                   }).format(currentPlan.amount_cents / 100)}
-                  /{currentPlan.interval === 'month' ? 'month' : currentPlan.interval === 'year' ? 'year' : currentPlan.interval}
+                  /
+                  {currentPlan.interval === 'month'
+                    ? 'month'
+                    : currentPlan.interval === 'year'
+                      ? 'year'
+                      : currentPlan.interval}
                 </p>
               )}
               {subscription.status === 'trialing' && subscription.trial_end ? (
@@ -137,7 +149,8 @@ export function SubscriptionDetails({
               )}
               {subscription.cancel_at_period_end && (
                 <p className="mt-2 text-sm text-amber-600 dark:text-amber-400">
-                  Cancels on {formatDate(subscription.current_period_end)}. You can resume your subscription in the portal before then.
+                  Cancels on {formatDate(subscription.current_period_end)}. You
+                  can resume your subscription in the portal before then.
                 </p>
               )}
             </div>

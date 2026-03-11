@@ -3,7 +3,11 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { Button } from '#/components/ui/button'
 import { apiFetch } from '#/lib/api'
 import type { ApiError } from '#/lib/api'
-import type { SubscriptionPlan, SubscriptionWithPlan, TokenPackage } from '#/types'
+import type {
+  SubscriptionPlan,
+  SubscriptionWithPlan,
+  TokenPackage,
+} from '#/types'
 import { PlanCard } from './PlanCard'
 import { PackageCard } from './PackageCard'
 import { SubscriptionDetails } from './SubscriptionDetails'
@@ -44,10 +48,20 @@ export function OrgBillingTab({ orgId }: OrgBillingTabProps) {
   useEffect(() => {
     const params = new URLSearchParams(window.location.search)
     if (params.get('billing') === 'success') {
-      queryClient.invalidateQueries({ queryKey: ['billing', 'subscription', orgId] })
-      queryClient.invalidateQueries({ queryKey: ['billing', 'transactions', orgId] })
-      queryClient.invalidateQueries({ queryKey: ['billing', 'subscription-status'] })
-      window.history.replaceState({}, '', window.location.pathname + '?tab=billing')
+      queryClient.invalidateQueries({
+        queryKey: ['billing', 'subscription', orgId],
+      })
+      queryClient.invalidateQueries({
+        queryKey: ['billing', 'transactions', orgId],
+      })
+      queryClient.invalidateQueries({
+        queryKey: ['billing', 'subscription-status'],
+      })
+      window.history.replaceState(
+        {},
+        '',
+        window.location.pathname + '?tab=billing',
+      )
     }
   }, [orgId, queryClient])
 
@@ -56,7 +70,7 @@ export function OrgBillingTab({ orgId }: OrgBillingTabProps) {
     queryFn: async (): Promise<SubscriptionWithPlan | null> => {
       try {
         return await apiFetch<SubscriptionWithPlan>(
-          `/v1/orgs/${orgId}/billing/subscription`
+          `/v1/orgs/${orgId}/billing/subscription`,
         )
       } catch (e) {
         const err = e as ApiError
@@ -85,14 +99,17 @@ export function OrgBillingTab({ orgId }: OrgBillingTabProps) {
   const portalMutation = useMutation({
     mutationFn: () =>
       apiFetch<{ url: string }>(
-        `/v1/orgs/${orgId}/billing/portal?return_url=${encodeURIComponent(window.location.href)}`
+        `/v1/orgs/${orgId}/billing/portal?return_url=${encodeURIComponent(window.location.href)}`,
       ),
     onSuccess: (data) => {
       window.open(data.url, '_blank', 'noopener,noreferrer')
     },
   })
 
-  const handleCheckout = async (priceId: string, mode: 'subscription' | 'payment') => {
+  const handleCheckout = async (
+    priceId: string,
+    mode: 'subscription' | 'payment',
+  ) => {
     setCheckoutLoading(priceId)
     try {
       const { url } = await apiFetch<{ url: string }>(
@@ -105,7 +122,7 @@ export function OrgBillingTab({ orgId }: OrgBillingTabProps) {
             success_url: `${window.location.origin}/orgs/${orgId}?billing=success`,
             cancel_url: `${window.location.origin}/orgs/${orgId}?billing=canceled`,
           }),
-        }
+        },
       )
       window.location.href = url
     } catch {
@@ -114,9 +131,15 @@ export function OrgBillingTab({ orgId }: OrgBillingTabProps) {
   }
 
   const onSubscriptionChanged = () => {
-    queryClient.invalidateQueries({ queryKey: ['billing', 'subscription', orgId] })
-    queryClient.invalidateQueries({ queryKey: ['billing', 'transactions', orgId] })
-    queryClient.invalidateQueries({ queryKey: ['billing', 'subscription-status'] })
+    queryClient.invalidateQueries({
+      queryKey: ['billing', 'subscription', orgId],
+    })
+    queryClient.invalidateQueries({
+      queryKey: ['billing', 'transactions', orgId],
+    })
+    queryClient.invalidateQueries({
+      queryKey: ['billing', 'subscription-status'],
+    })
   }
 
   const hasSubscription = subscription != null
@@ -151,7 +174,9 @@ export function OrgBillingTab({ orgId }: OrgBillingTabProps) {
                     key={plan.id}
                     plan={plan}
                     orgId={orgId}
-                    onCheckout={(priceId) => handleCheckout(priceId, 'subscription')}
+                    onCheckout={(priceId) =>
+                      handleCheckout(priceId, 'subscription')
+                    }
                     loading={checkoutLoading === plan.stripe_price_id}
                   />
                 ))}
@@ -162,7 +187,7 @@ export function OrgBillingTab({ orgId }: OrgBillingTabProps) {
               </p>
             )}
           </section>
-          </>
+        </>
       )}
 
       <section>
@@ -194,7 +219,9 @@ export function OrgBillingTab({ orgId }: OrgBillingTabProps) {
           <p className="text-sm text-[var(--sea-ink-soft)]">Loading...</p>
         ) : transactions ? (
           <TransactionTable
-            subscriptionTransactions={transactions.subscription_transactions ?? []}
+            subscriptionTransactions={
+              transactions.subscription_transactions ?? []
+            }
             creditTransactions={transactions.credit_transactions ?? []}
           />
         ) : null}

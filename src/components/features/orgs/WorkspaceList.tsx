@@ -38,7 +38,10 @@ export function WorkspaceList({
     try {
       await apiFetch<Workspace>(`/v1/orgs/${orgId}/workspaces`, {
         method: 'POST',
-        body: JSON.stringify({ name: name.trim(), slug: slug.trim() || undefined }),
+        body: JSON.stringify({
+          name: name.trim(),
+          slug: slug.trim() || undefined,
+        }),
       })
       onCreated()
       setName('')
@@ -76,7 +79,10 @@ export function WorkspaceList({
       )}
 
       {showForm ? (
-        <form onSubmit={handleSubmit} className="space-y-4 rounded-lg border p-4">
+        <form
+          onSubmit={handleSubmit}
+          className="space-y-4 rounded-lg border p-4"
+        >
           <div className="space-y-2">
             <Label htmlFor="ws-name">Name</Label>
             <Input

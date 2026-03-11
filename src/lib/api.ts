@@ -47,9 +47,15 @@ async function handleResponse<T>(res: Response): Promise<T> {
   return (body ?? {}) as T
 }
 
+const MUTABLE_METHODS = ['POST', 'PUT', 'PATCH', 'DELETE'] as const
+
+function needsIdempotencyKey(method?: string): boolean {
+  return method != null && MUTABLE_METHODS.includes(method as (typeof MUTABLE_METHODS)[number])
+}
+
 export async function apiFetch<T>(
   path: string,
-  options: RequestInit = {}
+  options: RequestInit = {},
 ): Promise<T> {
   const url = path.startsWith('http') ? path : `${API_BASE}${path}`
   const token = getToken?.() ?? null
@@ -61,6 +67,11 @@ export async function apiFetch<T>(
   if (token) {
     ;(headers as Record<string, string>)['Authorization'] = `Bearer ${token}`
   }
+  if (needsIdempotencyKey(options.method)) {
+    ;(headers as Record<string, string>)['Idempotency-Key'] =
+      (options.headers as Record<string, string>)?.['Idempotency-Key'] ??
+      crypto.randomUUID()
+  }
 
   const res = await fetch(url, { ...options, headers })
   return handleResponse<T>(res)
@@ -68,7 +79,7 @@ export async function apiFetch<T>(
 
 export async function apiFetchBlob(
   path: string,
-  options: RequestInit = {}
+  options: RequestInit = {},
 ): Promise<Blob> {
   const url = path.startsWith('http') ? path : `${API_BASE}${path}`
   const token = getToken?.()

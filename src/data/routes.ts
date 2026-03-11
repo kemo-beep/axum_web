@@ -23,5 +23,7 @@ export function isLandingPath(pathname: string): boolean {
 }
 
 export function isAppPath(pathname: string): boolean {
-  return APP_PATH_PREFIXES.some((prefix) => pathname === prefix || pathname.startsWith(prefix + '/'))
+  return APP_PATH_PREFIXES.some(
+    (prefix) => pathname === prefix || pathname.startsWith(prefix + '/'),
+  )
 }

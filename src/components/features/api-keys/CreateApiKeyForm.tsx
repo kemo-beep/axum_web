@@ -12,7 +12,10 @@ interface CreateApiKeyFormProps {
 
 const DEFAULT_PERMISSIONS = ['files:read', 'files:write']
 
-export function CreateApiKeyForm({ onCreated, onError }: CreateApiKeyFormProps) {
+export function CreateApiKeyForm({
+  onCreated,
+  onError,
+}: CreateApiKeyFormProps) {
   const [name, setName] = useState('')
   const [permissions, setPermissions] = useState(DEFAULT_PERMISSIONS.join(', '))
   const [expiresInDays, setExpiresInDays] = useState('')
@@ -47,7 +50,7 @@ export function CreateApiKeyForm({ onCreated, onError }: CreateApiKeyFormProps) 
         {
           method: 'POST',
           body: JSON.stringify(body),
-        }
+        },
       )
       toast.success('API key created')
       onCreated(res.id, res.name, res.key)
@@ -77,9 +80,7 @@ export function CreateApiKeyForm({ onCreated, onError }: CreateApiKeyFormProps) 
         />
       </div>
       <div className="space-y-2">
-        <Label htmlFor="key-permissions">
-          Permissions (comma-separated)
-        </Label>
+        <Label htmlFor="key-permissions">Permissions (comma-separated)</Label>
         <Input
           id="key-permissions"
           value={permissions}

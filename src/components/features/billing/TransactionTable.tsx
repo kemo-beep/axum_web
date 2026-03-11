@@ -20,7 +20,12 @@ import {
   SheetHeader,
   SheetTitle,
 } from '#/components/ui/sheet'
-import { EllipsisVertical, FileText, ExternalLink, Download } from 'lucide-react'
+import {
+  EllipsisVertical,
+  FileText,
+  ExternalLink,
+  Download,
+} from 'lucide-react'
 
 interface TransactionItem {
   id: string
@@ -63,9 +68,15 @@ export function TransactionTable({
   }
 
   const all = [
-    ...subscriptionTransactions.map((t) => ({ ...t, source: 'subscription' as const })),
+    ...subscriptionTransactions.map((t) => ({
+      ...t,
+      source: 'subscription' as const,
+    })),
     ...creditTransactions.map((t) => ({ ...t, source: 'credit' as const })),
-  ].sort((a, b) => new Date(b.occurred_at).getTime() - new Date(a.occurred_at).getTime())
+  ].sort(
+    (a, b) =>
+      new Date(b.occurred_at).getTime() - new Date(a.occurred_at).getTime(),
+  )
 
   if (all.length === 0) {
     return (
@@ -173,13 +184,20 @@ export function TransactionTable({
               <div>
                 <dt className="text-[var(--sea-ink-soft)]">Type</dt>
                 <dd>
-                  {detailsTransaction.event_type ?? detailsTransaction.kind ?? '-'}
+                  {detailsTransaction.event_type ??
+                    detailsTransaction.kind ??
+                    '-'}
                   {detailsTransaction.source === 'credit' ? ' (credit)' : ''}
                 </dd>
               </div>
               <div>
                 <dt className="text-[var(--sea-ink-soft)]">Amount</dt>
-                <dd>{formatAmount(detailsTransaction.amount_cents, detailsTransaction.currency)}</dd>
+                <dd>
+                  {formatAmount(
+                    detailsTransaction.amount_cents,
+                    detailsTransaction.currency,
+                  )}
+                </dd>
               </div>
               <div>
                 <dt className="text-[var(--sea-ink-soft)]">Status</dt>

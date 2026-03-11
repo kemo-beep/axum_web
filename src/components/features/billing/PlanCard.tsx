@@ -30,12 +30,19 @@ export function PlanCard({
       }).format(plan.amount_cents / 100)
     : 'Custom'
 
-  const interval = plan.interval === 'month' ? '/month' : plan.interval === 'year' ? '/year' : ''
+  const interval =
+    plan.interval === 'month'
+      ? '/month'
+      : plan.interval === 'year'
+        ? '/year'
+        : ''
 
   const isCurrentPlan = currentPlanId != null && currentPlanId === plan.id
   const isChangePlanMode = currentPlanId != null && onChangePlan != null
-  const isUpgrade = isChangePlanMode && plan.amount_cents > currentPlanAmountCents
-  const isDowngrade = isChangePlanMode && plan.amount_cents < currentPlanAmountCents
+  const isUpgrade =
+    isChangePlanMode && plan.amount_cents > currentPlanAmountCents
+  const isDowngrade =
+    isChangePlanMode && plan.amount_cents < currentPlanAmountCents
   const changeLoading = changePlanLoading === plan.stripe_price_id
 
   const renderButton = () => {
@@ -64,7 +71,10 @@ export function PlanCard({
       )
     }
     return (
-      <Button onClick={() => onCheckout(plan.stripe_price_id)} disabled={loading}>
+      <Button
+        onClick={() => onCheckout(plan.stripe_price_id)}
+        disabled={loading}
+      >
         {loading ? 'Redirecting...' : 'Subscribe'}
       </Button>
     )

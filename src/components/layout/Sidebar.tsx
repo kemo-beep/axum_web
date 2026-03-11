@@ -64,7 +64,7 @@ function SidebarContent({ onNavigate }: { onNavigate?: () => void }) {
       </div>
       <nav className="flex-1 space-y-0.5 overflow-y-auto px-2 py-4">
         {APP_NAV.map((item) => {
-          const Icon = ICONS[item.label as keyof typeof ICONS]
+          const Icon = ICONS[item.label]
           const isActive =
             pathname === item.href ||
             (item.href !== '/dashboard' && pathname.startsWith(item.href))
@@ -77,7 +77,7 @@ function SidebarContent({ onNavigate }: { onNavigate?: () => void }) {
                 'flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors',
                 isActive
                   ? 'bg-[var(--lagoon)]/10 text-[var(--lagoon-deep)]'
-                  : 'text-[var(--sea-ink-soft)] hover:bg-[var(--link-bg-hover)] hover:text-[var(--sea-ink)]'
+                  : 'text-[var(--sea-ink-soft)] hover:bg-[var(--link-bg-hover)] hover:text-[var(--sea-ink)]',
               )}
             >
               {Icon && <Icon className="size-4 shrink-0" />}
@@ -112,7 +112,11 @@ function SidebarContent({ onNavigate }: { onNavigate?: () => void }) {
             </DropdownMenuTrigger>
             <DropdownMenuContent align="start" className="w-56">
               <DropdownMenuItem asChild>
-                <Link to="/billing/portal" target="_blank" rel="noopener noreferrer">
+                <Link
+                  to="/billing/portal"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
                   Manage billing
                 </Link>
               </DropdownMenuItem>

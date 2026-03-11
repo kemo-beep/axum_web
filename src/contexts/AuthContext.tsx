@@ -6,8 +6,8 @@ import {
   useMemo,
   useRef,
   useState,
-  type ReactNode,
 } from 'react'
+import type { ReactNode } from 'react'
 import type { User } from '#/types'
 import { apiFetch, setApiAuth } from '#/lib/api'
 
@@ -50,7 +50,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const refreshInFlightRef = useRef(false)
   const refreshUser = useCallback(async () => {
-    const t = typeof window !== 'undefined' ? localStorage.getItem(TOKEN_KEY) : token
+    const t =
+      typeof window !== 'undefined' ? localStorage.getItem(TOKEN_KEY) : token
     if (!t) {
       setUser(null)
       setLoading(false)
@@ -61,7 +62,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     try {
       const controller = new AbortController()
       const timeout = setTimeout(() => controller.abort(), 15_000)
-      const me = await apiFetch<User>('/v1/auth/me', { signal: controller.signal })
+      const me = await apiFetch<User>('/v1/auth/me', {
+        signal: controller.signal,
+      })
       clearTimeout(timeout)
       setUser(me)
     } catch {
@@ -86,7 +89,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, [])
 
   useEffect(() => {
-    const t = typeof window !== 'undefined' ? localStorage.getItem(TOKEN_KEY) : null
+    const t =
+      typeof window !== 'undefined' ? localStorage.getItem(TOKEN_KEY) : null
     if (!t) {
       setLoading(false)
       return
@@ -102,12 +106,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       }
       // User fetch is handled by the token-change useEffect via refreshUser
     },
-    [setToken]
+    [setToken],
   )
 
   const value = useMemo<AuthContextValue>(
     () => ({ user, token, loading, login, logout, refreshUser }),
-    [user, token, loading, login, logout, refreshUser]
+    [user, token, loading, login, logout, refreshUser],
   )
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>

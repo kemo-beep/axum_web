@@ -1,5 +1,4 @@
-import { useLocation } from '@tanstack/react-router'
-import { Navigate } from '@tanstack/react-router'
+import { useLocation, Navigate } from '@tanstack/react-router'
 import { useAuth } from '#/hooks/useAuth'
 import { isAppPath, isLandingPath } from '#/data/routes'
 import { AppShell } from './AppShell'

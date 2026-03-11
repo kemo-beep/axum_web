@@ -18,7 +18,9 @@ export function AuthLayout({ children, title, subtitle }: AuthLayoutProps) {
               </h1>
             )}
             {subtitle && (
-              <p className="mt-2 text-sm text-[var(--sea-ink-soft)]">{subtitle}</p>
+              <p className="mt-2 text-sm text-[var(--sea-ink-soft)]">
+                {subtitle}
+              </p>
             )}
           </div>
         )}
