@@ -1,19 +1,35 @@
 import type { ReactNode } from 'react'
 import { Sidebar } from './Sidebar'
+import { Header } from './Header'
+import { SidebarProvider, useSidebar } from './SidebarContext'
 
 interface AppShellProps {
   children: ReactNode
 }
 
+function AppShellContent({ children }: AppShellProps) {
+  const { isCollapsed } = useSidebar()
+
+  return (
+    <div className="flex min-h-screen bg-[var(--background)]">
+      <Sidebar />
+      <div
+        className={`flex w-full flex-col transition-all duration-300 ease-in-out ${isCollapsed ? 'lg:pl-16' : 'lg:pl-60'
+          }`}
+      >
+        <Header />
+        <main className="flex-1 w-full mx-auto p-4 sm:p-6 lg:p-8">
+          {children}
+        </main>
+      </div>
+    </div>
+  )
+}
+
 export function AppShell({ children }: AppShellProps) {
   return (
-    <div className="flex min-h-screen">
-      <Sidebar />
-      <main className="flex-1 pt-14 lg:ml-60 lg:pt-0">
-        <div className="min-h-screen px-4 py-6 sm:px-6 lg:px-8 lg:py-8">
-          {children}
-        </div>
-      </main>
-    </div>
+    <SidebarProvider>
+      <AppShellContent>{children}</AppShellContent>
+    </SidebarProvider>
   )
 }

@@ -1,5 +1,6 @@
 import {
   HeadContent,
+  Outlet,
   Scripts,
   createRootRouteWithContext,
 } from '@tanstack/react-router'
@@ -38,27 +39,50 @@ export const Route = createRootRouteWithContext<MyRouterContext>()({
       },
     ],
   }),
-  shellComponent: RootDocument,
+  ssr: false,
+  errorComponent: ({ error }) => (
+    <div className="flex min-h-screen flex-col items-center justify-center gap-4 p-8 text-center">
+      <h1 className="text-xl font-semibold text-red-600">Something went wrong</h1>
+      <p className="text-sm text-zinc-600 max-w-md">
+        {error?.message ?? 'An unexpected error occurred'}
+      </p>
+    </div>
+  ),
+  pendingComponent: () => (
+    <div className="flex min-h-screen items-center justify-center">
+      <div className="size-8 animate-spin rounded-full border-2 border-[var(--lagoon)] border-t-transparent" />
+    </div>
+  ),
+  shellComponent: RootShell,
+  component: RootDocument,
 })
 
-function RootDocument({ children }: { children: React.ReactNode }) {
+function RootShell({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en" suppressHydrationWarning>
       <head>
         <script dangerouslySetInnerHTML={{ __html: THEME_INIT_SCRIPT }} />
         <HeadContent />
       </head>
-      <body className="font-sans antialiased [overflow-wrap:anywhere] selection:bg-[rgba(79,184,178,0.24)]">
-        <TanStackQueryProvider>
-          <AuthProvider>
-            <OrgProvider>
-              <Toaster richColors position="top-right" />
-              <AppLayout>{children}</AppLayout>
-            </OrgProvider>
-          </AuthProvider>
-        </TanStackQueryProvider>
+      <body className="font-sans antialiased [overflow-wrap:anywhere] selection:bg-[rgba(79,184,178,0.24)]" suppressHydrationWarning>
+        {children}
         <Scripts />
       </body>
     </html>
+  )
+}
+
+function RootDocument() {
+  return (
+    <TanStackQueryProvider>
+      <AuthProvider>
+        <OrgProvider>
+          <Toaster richColors position="top-right" />
+          <AppLayout>
+            <Outlet />
+          </AppLayout>
+        </OrgProvider>
+      </AuthProvider>
+    </TanStackQueryProvider>
   )
 }

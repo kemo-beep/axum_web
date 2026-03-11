@@ -118,7 +118,7 @@ export function HomePage() {
             <Button
               size="lg"
               asChild
-              className="h-14 rounded-full px-10 bg-(--lagoon-deep) text-white dark:bg-(--lagoon) dark:text-(--bg-base) shadow-[0_0_40px_-10px_var(--lagoon)] hover:shadow-[0_0_60px_-15px_var(--lagoon)] hover:scale-105 transition-all duration-300 ease-out"
+              className="h-14 rounded-full px-10 bg-(--lagoon-deep) !text-[#b2e2e6] dark:bg-(--lagoon) dark:text-(--bg-base) shadow-[0_0_40px_-10px_var(--lagoon)] hover:shadow-[0_0_60px_-15px_var(--lagoon)] hover:scale-105 transition-all duration-300 ease-out"
             >
               <Link to="/register" className="font-semibold tracking-wide">
                 Get started free
@@ -265,7 +265,7 @@ export function HomePage() {
           whileInView={{ opacity: 1, scale: 1 }}
           viewport={{ once: true, margin: '-100px' }}
           transition={{ duration: 1, ease: [0.16, 1, 0.3, 1] }}
-          className="page-wrap mx-auto max-w-4xl rounded-[3rem] p-12 sm:p-20 text-center border border-[var(--line)] bg-gradient-to-b from-[var(--surface-strong)] to-[var(--surface)] shadow-2xl"
+          className="page-wrap mx-auto max-w-4xl rounded-[3rem] p-12 sm:p-20 text-center border border-[var(--line)] bg-gradient-to-b from-[var(--surface-strong)] to-[var(--surface)] shadow-none"
         >
           <p className="mb-6 text-sm font-bold uppercase tracking-[0.2em] text-[var(--lagoon)]">
             The Foundation
