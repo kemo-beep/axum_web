@@ -6,6 +6,7 @@ import {
 import { Toaster } from 'sonner'
 import { AppLayout } from '../components/layout/AppLayout'
 import { AuthProvider } from '../contexts/AuthContext'
+import { OrgProvider } from '../contexts/OrgContext'
 import TanStackQueryProvider from '../integrations/tanstack-query/root-provider'
 import appCss from '../styles.css?url'
 import type { QueryClient } from '@tanstack/react-query'
@@ -50,8 +51,10 @@ function RootDocument({ children }: { children: React.ReactNode }) {
       <body className="font-sans antialiased [overflow-wrap:anywhere] selection:bg-[rgba(79,184,178,0.24)]">
         <TanStackQueryProvider>
           <AuthProvider>
-            <Toaster richColors position="top-right" />
-            <AppLayout>{children}</AppLayout>
+            <OrgProvider>
+              <Toaster richColors position="top-right" />
+              <AppLayout>{children}</AppLayout>
+            </OrgProvider>
           </AuthProvider>
         </TanStackQueryProvider>
         <Scripts />

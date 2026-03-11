@@ -2,7 +2,7 @@ import { createFileRoute } from '@tanstack/react-router'
 import { OrgDetailPage } from '#/components/pages/OrgDetailPage'
 import { ProtectedRoute } from '#/components/shared/ProtectedRoute'
 
-const VALID_TABS = ['members', 'workspaces', 'invites', 'billing'] as const
+const VALID_TABS = ['members', 'workspaces', 'billing'] as const
 type TabValue = (typeof VALID_TABS)[number]
 
 function parseTab(value: unknown): TabValue {

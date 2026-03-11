@@ -1,9 +1,18 @@
+import { useState } from 'react'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { Link, useParams } from '@tanstack/react-router'
+import { useAuth } from '#/hooks/useAuth'
 import { toast } from 'sonner'
 import { apiFetch } from '#/lib/api'
 import type { Org, OrgMember, Workspace } from '#/types'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '#/components/ui/tabs'
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from '#/components/ui/dialog'
+import { Button } from '#/components/ui/button'
 import { MemberTable } from '#/components/features/orgs/MemberTable'
 import { InviteForm } from '#/components/features/orgs/InviteForm'
 import { WorkspaceList } from '#/components/features/orgs/WorkspaceList'
@@ -18,7 +27,9 @@ type OrgDetailPageProps = {
 
 export function OrgDetailPage({ tab }: OrgDetailPageProps) {
   const { orgId } = useParams({ strict: false })
+  const { user } = useAuth()
   const queryClient = useQueryClient()
+  const [inviteDialogOpen, setInviteDialogOpen] = useState(false)
 
   const { data: org, isLoading: orgLoading } = useQuery({
     queryKey: ['org', orgId],
@@ -102,15 +113,6 @@ export function OrgDetailPage({ tab }: OrgDetailPageProps) {
                 Workspaces
               </Link>
             </TabsTrigger>
-            <TabsTrigger value="invites" asChild className="rounded-xl px-6 data-[state=active]:bg-white data-[state=active]:shadow-sm data-[state=active]:text-[var(--lagoon-deep)] transition-all">
-              <Link
-                to="/orgs/$orgId"
-                params={{ orgId: orgId as string }}
-                search={{ tab: 'invites' }}
-              >
-                Invites
-              </Link>
-            </TabsTrigger>
             <TabsTrigger value="billing" asChild className="rounded-xl px-6 data-[state=active]:bg-white data-[state=active]:shadow-sm data-[state=active]:text-[var(--lagoon-deep)] transition-all">
               <Link
                 to="/orgs/$orgId"
@@ -132,9 +134,48 @@ export function OrgDetailPage({ tab }: OrgDetailPageProps) {
                 exit="exit"
               >
                 <TabsContent value="members" className="mt-0 outline-none">
-                  <div className="bg-white rounded-2xl border border-[var(--line)] shadow-sm overflow-hidden">
-                    <MemberTable members={members ?? []} />
+                  <div className="space-y-4">
+                    <div className="flex items-center justify-between">
+                      <h2 className="text-lg font-semibold text-[var(--sea-ink)]">
+                        Team members
+                      </h2>
+                      <Button
+                        onClick={() => setInviteDialogOpen(true)}
+                        className="rounded-xl"
+                      >
+                        Invite member
+                      </Button>
+                    </div>
+                    <div className="bg-white rounded-2xl border border-[var(--line)] shadow-sm overflow-hidden">
+                      <MemberTable
+                        orgId={orgId as string}
+                        members={members ?? []}
+                        currentUserId={user?.id}
+                        onMemberUpdated={refetchMembers}
+                        onMemberRemoved={refetchMembers}
+                      />
+                    </div>
                   </div>
+                  <Dialog
+                    open={inviteDialogOpen}
+                    onOpenChange={setInviteDialogOpen}
+                  >
+                    <DialogContent className="sm:max-w-[425px] rounded-2xl p-6">
+                      <DialogHeader>
+                        <DialogTitle>Invite member</DialogTitle>
+                      </DialogHeader>
+                      <InviteForm
+                        orgId={orgId as string}
+                        onInvited={() => {
+                          refetchMembers()
+                          setInviteDialogOpen(false)
+                        }}
+                        onError={(msg) =>
+                          toast.error(msg ?? 'Failed to send invite')
+                        }
+                      />
+                    </DialogContent>
+                  </Dialog>
                 </TabsContent>
 
                 <TabsContent value="workspaces" className="mt-0 outline-none">
@@ -144,16 +185,6 @@ export function OrgDetailPage({ tab }: OrgDetailPageProps) {
                     onCreated={refetchAll}
                     onError={(msg) => toast.error(msg ?? 'Something went wrong')}
                   />
-                </TabsContent>
-
-                <TabsContent value="invites" className="mt-0 outline-none">
-                  <div className="max-w-2xl mx-auto space-y-4">
-                    <InviteForm
-                      orgId={orgId as string}
-                      onInvited={refetchMembers}
-                      onError={(msg) => toast.error(msg ?? 'Something went wrong')}
-                    />
-                  </div>
                 </TabsContent>
 
                 <TabsContent value="billing" className="mt-0 outline-none">

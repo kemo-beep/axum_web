@@ -13,6 +13,7 @@ export interface Org {
 
 export interface OrgMember {
   user_id: string
+  email?: string
   role: string
 }
 

@@ -5,8 +5,15 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '#/components/ui/dropdown-menu'
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from '#/components/ui/dialog'
 import {
   Sheet,
   SheetContent,
@@ -16,7 +23,9 @@ import {
 import { Button } from '#/components/ui/button'
 import ThemeToggle from '#/components/ThemeToggle'
 import { useAuth } from '#/hooks/useAuth'
+import { useOrg } from '#/hooks/useOrg'
 import { APP_NAV } from '#/data/nav'
+import { CreateOrgForm } from '#/components/features/orgs/CreateOrgForm'
 import {
   LayoutDashboard,
   Building2,
@@ -24,6 +33,9 @@ import {
   Key,
   ChevronDown,
   Menu,
+  Plus,
+  Check,
+  Settings,
 } from 'lucide-react'
 import { apiFetch } from '#/lib/api'
 import { cn } from '#/lib/utils'
@@ -37,6 +49,16 @@ const ICONS = {
 
 function SidebarContent({ onNavigate }: { onNavigate?: () => void }) {
   const { user, loading, logout } = useAuth()
+  const {
+    orgs,
+    selectedOrg,
+    selectedOrgId,
+    setSelectedOrgId,
+    refetchOrgs,
+    isLoading: orgsLoading,
+  } = useOrg()
+  const [createOrgOpen, setCreateOrgOpen] = useState(false)
+  const [createError, setCreateError] = useState<string | null>(null)
   const location = useLocation()
   const pathname = location.pathname
 
@@ -48,6 +70,22 @@ function SidebarContent({ onNavigate }: { onNavigate?: () => void }) {
   })
 
   const planName = subscriptionStatus?.plan_name ?? null
+
+  const handleOrgCreated = (org: { id: string }) => {
+    setCreateOrgOpen(false)
+    setCreateError(null)
+    refetchOrgs()
+    setSelectedOrgId(org.id)
+    onNavigate?.()
+  }
+
+  const navItems = APP_NAV.map((item) => {
+    const href =
+      item.label === 'Billing' && selectedOrgId
+        ? `/orgs/${selectedOrgId}?tab=billing`
+        : item.href
+    return { ...item, href }
+  })
 
   return (
     <div className="flex h-full flex-col">
@@ -62,15 +100,91 @@ function SidebarContent({ onNavigate }: { onNavigate?: () => void }) {
           SaaS App
         </Link>
       </div>
+      {user && !loading && (
+        <div className="border-b border-[var(--line)] px-2 py-3">
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button
+                variant="ghost"
+                className="w-full justify-between gap-1 px-3 py-2.5 text-left font-medium"
+              >
+                <span className="truncate text-sm text-[var(--sea-ink)]">
+                  {orgsLoading
+                    ? 'Loading...'
+                    : selectedOrg?.name ?? 'Select organization'}
+                </span>
+                <ChevronDown className="size-4 shrink-0 text-[var(--sea-ink-soft)]" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="start" className="w-56">
+              {orgs.map((org) => (
+                <DropdownMenuItem
+                  key={org.id}
+                  onClick={() => {
+                    setSelectedOrgId(org.id)
+                    onNavigate?.()
+                  }}
+                >
+                  <span className="flex-1 truncate">{org.name}</span>
+                  {selectedOrgId === org.id && (
+                    <Check className="ml-2 size-4 shrink-0 text-[var(--lagoon)]" />
+                  )}
+                </DropdownMenuItem>
+              ))}
+              <DropdownMenuSeparator />
+              <DropdownMenuItem onClick={() => setCreateOrgOpen(true)}>
+                <Plus className="mr-2 size-4" />
+                Create organization
+              </DropdownMenuItem>
+              {selectedOrgId && (
+                <DropdownMenuItem asChild>
+                  <Link
+                    to="/orgs/$orgId"
+                    params={{ orgId: selectedOrgId }}
+                    onClick={onNavigate}
+                  >
+                    <Settings className="mr-2 size-4" />
+                    Edit organization
+                  </Link>
+                </DropdownMenuItem>
+              )}
+              <DropdownMenuItem asChild>
+                <Link to="/orgs" onClick={onNavigate}>
+                  <Building2 className="mr-2 size-4" />
+                  Manage organizations
+                </Link>
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+          <Dialog open={createOrgOpen} onOpenChange={setCreateOrgOpen}>
+            <DialogContent className="sm:max-w-[425px] rounded-[2rem] p-6 shadow-2xl border-[var(--line)] bg-[var(--surface-strong)] backdrop-blur-3xl">
+              <DialogHeader>
+                <DialogTitle className="text-xl">Create organization</DialogTitle>
+              </DialogHeader>
+              {createError && (
+                <div className="rounded-xl bg-red-50 dark:bg-red-900/20 p-4 text-sm font-medium text-red-700 dark:text-red-400 border border-red-200">
+                  {createError}
+                </div>
+              )}
+              <CreateOrgForm
+                onCreated={handleOrgCreated}
+                onError={setCreateError}
+              />
+            </DialogContent>
+          </Dialog>
+        </div>
+      )}
       <nav className="flex-1 space-y-0.5 overflow-y-auto px-2 py-4">
-        {APP_NAV.map((item) => {
+        {navItems.map((item) => {
           const Icon = ICONS[item.label]
+          const baseHref = item.label === 'Billing' ? '/orgs' : item.href
           const isActive =
             pathname === item.href ||
-            (item.href !== '/dashboard' && pathname.startsWith(item.href))
+            (baseHref !== '/dashboard' &&
+              pathname.startsWith(baseHref))
           return (
             <Link
-              key={item.href}
+              key={item.label}
               to={item.href}
               onClick={onNavigate}
               className={cn(
