@@ -5,6 +5,10 @@ import {
     MessageSquare,
     PanelLeft,
     ChevronRight,
+    Coins,
+    Plus,
+    CreditCard,
+    User,
 } from 'lucide-react'
 import { Button } from '#/components/ui/button'
 import { Avatar, AvatarFallback } from '#/components/ui/avatar'
@@ -21,11 +25,18 @@ import {
 } from '#/components/ui/dropdown-menu'
 import { useSidebar } from './SidebarContext'
 import { useAuth } from '#/hooks/useAuth'
+import { useOrg } from '#/hooks/useOrg'
+import { useOrgCredits } from '#/hooks/useOrgCredits'
+import { useSubscriptionStatus } from '#/hooks/useSubscriptionStatus'
 import ThemeToggle from '#/components/ThemeToggle'
+import { CreditRing } from '#/components/ui/credit-ring'
 
 export function Header() {
     const { toggleSidebar } = useSidebar()
     const { user, logout } = useAuth()
+    const { selectedOrgId } = useOrg()
+    const { data: credits } = useOrgCredits(selectedOrgId ?? null)
+    const { data: subscriptionStatus } = useSubscriptionStatus()
     const location = useLocation()
 
     // Generate a very rudimentary breadcrumb based on route
@@ -72,6 +83,22 @@ export function Header() {
 
             {/* Right side: Actions & User Avatar */}
             <div className="flex items-center gap-2">
+                {subscriptionStatus?.plan_name && (
+                    <div className="hidden sm:flex items-center gap-1.5 rounded-lg bg-[var(--line)]/30 px-2.5 py-1.5">
+                        <CreditCard className="size-3.5 text-[var(--lagoon)]" />
+                        <span className="text-sm font-medium text-[var(--sea-ink)]">
+                            {subscriptionStatus.plan_name}
+                        </span>
+                    </div>
+                )}
+                {selectedOrgId && credits?.balance != null && (
+                    <div className="hidden sm:flex items-center gap-1.5 rounded-lg bg-[var(--line)]/30 px-2.5 py-1.5">
+                        <Coins className="size-3.5 text-[var(--lagoon)]" />
+                        <span className="text-sm font-medium text-[var(--sea-ink)]">
+                            {credits.balance.toLocaleString()} credits
+                        </span>
+                    </div>
+                )}
                 <Button variant="outline" size="sm" className="hidden sm:flex h-8 bg-transparent text-[var(--sea-ink)] border-[var(--line)] hover:bg-[var(--line)] shadow-sm">
                     Feedback
                 </Button>
@@ -113,11 +140,66 @@ export function Header() {
                                 )}
                             </div>
                         </div>
+
+                        {selectedOrgId && credits != null && (
+                            <>
+                                <DropdownMenuSeparator />
+                                <div className="px-2 py-2">
+                                    <div className="flex items-center gap-2.5">
+                                        <div className="shrink-0">
+                                        <CreditRing
+                                            remaining={credits.balance}
+                                            consumed={credits.consumed}
+                                            size={36}
+                                            strokeWidth={2.5}
+                                        />
+                                        </div>
+                                        <div className="flex-1 min-w-0 overflow-hidden">
+                                            <p className="text-xs text-[var(--sea-ink-soft)] truncate">
+                                                {credits.balance.toLocaleString()} left
+                                                {credits.consumed > 0 && (
+                                                    <span className="text-[var(--sea-ink-soft)]/80">
+                                                        {' / '}{credits.consumed.toLocaleString()} used
+                                                    </span>
+                                                )}
+                                            </p>
+                                            <Link
+                                                to="/orgs/$orgId"
+                                                params={{ orgId: selectedOrgId }}
+                                                search={{ tab: 'billing' }}
+                                                className="mt-1 flex items-center gap-1 text-xs font-medium text-[var(--lagoon)] hover:underline"
+                                            >
+                                                <Plus className="size-3 shrink-0" />
+                                                Buy tokens
+                                            </Link>
+                                        </div>
+                                    </div>
+                                </div>
+                            </>
+                        )}
+
                         <DropdownMenuSeparator />
+
+                        <div className="px-2 py-1.5">
+                            <div className="flex items-center gap-2 text-xs">
+                                <CreditCard className="size-3.5 text-[var(--lagoon)] shrink-0" />
+                                <span className="text-[var(--sea-ink-soft)]">Plan:</span>
+                                <span className="font-medium text-[var(--sea-ink)]">
+                                    {subscriptionStatus?.plan_name ?? 'Free'}
+                                </span>
+                            </div>
+                        </div>
 
                         <DropdownMenuItem asChild className="cursor-pointer">
                             <Link to="/billing/portal" target="_blank" className="w-full">
-                                Subscription
+                                Manage subscription
+                            </Link>
+                        </DropdownMenuItem>
+
+                        <DropdownMenuItem asChild className="cursor-pointer">
+                            <Link to="/profile" className="flex w-full items-center gap-2">
+                                <User className="size-4 shrink-0" />
+                                Profile
                             </Link>
                         </DropdownMenuItem>
 

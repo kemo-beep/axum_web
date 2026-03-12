@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Link, useLocation } from '@tanstack/react-router'
 import {
   DropdownMenu,
@@ -32,13 +32,16 @@ import {
   Plus,
   Check,
   Settings,
+  Coins,
 } from 'lucide-react'
 import { cn } from '#/lib/utils'
 import { useSidebar } from './SidebarContext'
+import { useOrgCredits } from '#/hooks/useOrgCredits'
 
 const ICONS = {
   Dashboard: LayoutDashboard,
   Organizations: Building2,
+  Store: Coins,
   Billing: CreditCard,
   'API Keys': Key,
 }
@@ -66,6 +69,8 @@ function SidebarContent({ onNavigate }: { onNavigate?: () => void }) {
     setSelectedOrgId(org.id)
     onNavigate?.()
   }
+
+  const { data: credits } = useOrgCredits(selectedOrgId ?? null)
 
   const navItems = APP_NAV.map((item) => {
     const href =
@@ -165,6 +170,20 @@ function SidebarContent({ onNavigate }: { onNavigate?: () => void }) {
             </DropdownMenuContent>
           </DropdownMenu>
 
+          {selectedOrgId && !isCollapsed && (
+            <div className="mt-2 flex items-center gap-2 rounded-xl bg-[var(--line)]/30 px-3 py-2">
+              <Coins className="size-4 shrink-0 text-[var(--lagoon)]" />
+              <span className="text-xs font-medium text-[var(--sea-ink-soft)]">
+                Credits:
+              </span>
+              <span className="text-sm font-semibold text-[var(--sea-ink)]">
+                {credits?.balance != null
+                  ? credits.balance.toLocaleString()
+                  : '…'}
+              </span>
+            </div>
+          )}
+
           <Dialog open={createOrgOpen} onOpenChange={setCreateOrgOpen}>
             <DialogContent className="sm:max-w-[425px] rounded-[2rem] p-6 shadow-2xl border-[var(--line)] bg-[var(--surface-strong)] backdrop-blur-3xl">
               <DialogHeader>
@@ -233,14 +252,16 @@ function SidebarContent({ onNavigate }: { onNavigate?: () => void }) {
 }
 
 export function Sidebar() {
-  const { isCollapsed } = useSidebar()
+  const { isCollapsed, setIsCollapsed } = useSidebar()
+  const [isMobile, setIsMobile] = useState(false)
 
-  // Mobile nav doesn't use the top Header's toggle, it will get its own. 
-  // Wait, in AppShell mobile header is not existing? AppShell doesn't render mobile top nav anymore if we use the same Header.
-  // We need to inject the mobile drawer into the Header left toggle.
-  // Actually, we can hook `toggleSidebar` in Header to open the `Sheet` on mobile!
-  // It's cleaner if `isCollapsed` on mobile means Sheet is open. 
-  // Let's use `isCollapsed` to drive the Sheet open state on mobile? No, context is cleaner.
+  useEffect(() => {
+    const mq = window.matchMedia('(max-width: 1023px)')
+    const update = () => setIsMobile(mq.matches)
+    update()
+    mq.addEventListener('change', update)
+    return () => mq.removeEventListener('change', update)
+  }, [])
 
   return (
     <>
@@ -256,10 +277,10 @@ export function Sidebar() {
       {/* Mobile Sheet - usually triggered by a menu button in navigation, but we don't have it explicitly bound if Header handles it unless Header is the trigger */}
       {/* We will just expose a mobile Sheet here that listens to a local state or context, but since Header is in AppShell now, we should make Header toggle the Sheet on mobile. */}
       {/* For now, to keep it simple, Header toggles `isCollapsed`. We can make the Sheet read from `isCollapsed` and write to it. */}
-      <Sheet open={!isCollapsed} onOpenChange={() => {
-        // Only run this in mobile (can't easily check window size without hook, but CSS hides it)
-        // This is a bit hacky linking desktop state to mobile sheet.
-      }}>
+      <Sheet
+        open={isMobile && !isCollapsed}
+        onOpenChange={(open) => !open && setIsCollapsed(true)}
+      >
         <SheetContent side="left" className="w-64 p-0 md:hidden lg:hidden" aria-describedby="navigation menu">
           <SheetTitle className="sr-only">Navigation menu</SheetTitle>
           <div className="h-full w-full [&_div.lg\:w-16]:w-full">

@@ -11,7 +11,9 @@ export const LANDING_PATHS = [
 /** Path prefixes/patterns for the dashboard layout (sidebar). */
 const APP_PATH_PREFIXES = [
   '/dashboard',
+  '/profile',
   '/orgs',
+  '/store',
   '/billing',
   '/api-keys',
   '/invites',

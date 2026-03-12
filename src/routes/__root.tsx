@@ -6,6 +6,7 @@ import {
 } from '@tanstack/react-router'
 import { Toaster } from 'sonner'
 import { AppLayout } from '../components/layout/AppLayout'
+import { RealtimeConnector } from '../components/realtime/RealtimeConnector'
 import { AuthProvider } from '../contexts/AuthContext'
 import { OrgProvider } from '../contexts/OrgContext'
 import TanStackQueryProvider from '../integrations/tanstack-query/root-provider'
@@ -76,6 +77,7 @@ function RootDocument() {
   return (
     <TanStackQueryProvider>
       <AuthProvider>
+        <RealtimeConnector />
         <OrgProvider>
           <Toaster richColors position="top-right" />
           <AppLayout>

@@ -31,6 +31,7 @@ interface TransactionItem {
   id: string
   kind?: string
   event_type?: string
+  amount_tokens?: number
   amount_cents?: number
   currency?: string
   receipt_url?: string
@@ -38,7 +39,9 @@ interface TransactionItem {
   invoice_pdf_url?: string
   status?: string
   billing_email?: string
-  occurred_at: string
+  occurred_at?: string
+  created_at?: string
+  source?: 'subscription' | 'credit'
 }
 
 interface TransactionTableProps {
@@ -67,16 +70,29 @@ export function TransactionTable({
     }).format(cents / 100)
   }
 
+  const formatCreditAmount = (t: TransactionItem & { source?: 'subscription' | 'credit' }) => {
+    if (t.source === 'credit' && t.amount_tokens != null) {
+      const sign = t.amount_tokens >= 0 ? '+' : ''
+      const tokens = `${sign}${t.amount_tokens.toLocaleString()} credits`
+      if (t.amount_cents != null && t.amount_cents !== 0) {
+        return `${tokens} (${formatAmount(t.amount_cents, t.currency)})`
+      }
+      return tokens
+    }
+    return formatAmount(t.amount_cents, t.currency)
+  }
+
   const all = [
     ...subscriptionTransactions.map((t) => ({
       ...t,
       source: 'subscription' as const,
     })),
     ...creditTransactions.map((t) => ({ ...t, source: 'credit' as const })),
-  ].sort(
-    (a, b) =>
-      new Date(b.occurred_at).getTime() - new Date(a.occurred_at).getTime(),
-  )
+  ].sort((a, b) => {
+    const dateA = a.occurred_at ?? a.created_at ?? ''
+    const dateB = b.occurred_at ?? b.created_at ?? ''
+    return new Date(dateB).getTime() - new Date(dateA).getTime()
+  })
 
   if (all.length === 0) {
     return (
@@ -106,12 +122,12 @@ export function TransactionTable({
         <TableBody>
           {all.map((t) => (
             <TableRow key={`${t.source}-${t.id}`}>
-              <TableCell>{formatDate(t.occurred_at)}</TableCell>
+              <TableCell>{formatDate(t.occurred_at ?? t.created_at ?? '')}</TableCell>
               <TableCell>
                 {t.event_type ?? t.kind ?? '-'}
                 {t.source === 'credit' ? ' (credit)' : ''}
               </TableCell>
-              <TableCell>{formatAmount(t.amount_cents, t.currency)}</TableCell>
+              <TableCell>{formatCreditAmount(t)}</TableCell>
               <TableCell>{t.status ?? '-'}</TableCell>
               <TableCell>
                 <DropdownMenu>
@@ -179,7 +195,13 @@ export function TransactionTable({
             <dl className="mt-4 grid gap-3 text-sm">
               <div>
                 <dt className="text-[var(--sea-ink-soft)]">Date</dt>
-                <dd>{formatDate(detailsTransaction.occurred_at)}</dd>
+                <dd>
+                  {formatDate(
+                    detailsTransaction.occurred_at ??
+                      detailsTransaction.created_at ??
+                      '',
+                  )}
+                </dd>
               </div>
               <div>
                 <dt className="text-[var(--sea-ink-soft)]">Type</dt>
@@ -192,12 +214,7 @@ export function TransactionTable({
               </div>
               <div>
                 <dt className="text-[var(--sea-ink-soft)]">Amount</dt>
-                <dd>
-                  {formatAmount(
-                    detailsTransaction.amount_cents,
-                    detailsTransaction.currency,
-                  )}
-                </dd>
+                <dd>{formatCreditAmount(detailsTransaction)}</dd>
               </div>
               <div>
                 <dt className="text-[var(--sea-ink-soft)]">Status</dt>

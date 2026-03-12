@@ -7,12 +7,15 @@ interface PackageCardProps {
   orgId: string
   onCheckout: (priceId: string) => void
   loading?: boolean
+  /** Disable purchase (e.g. when no org selected) */
+  disabled?: boolean
 }
 
 export function PackageCard({
   pkg,
   onCheckout,
   loading = false,
+  disabled = false,
 }: PackageCardProps) {
   const price = new Intl.NumberFormat('en-US', {
     style: 'currency',
@@ -31,10 +34,10 @@ export function PackageCard({
         </p>
         <Button
           onClick={() => onCheckout(pkg.stripe_price_id)}
-          disabled={loading}
+          disabled={loading || disabled}
           variant="outline"
         >
-          {loading ? 'Redirecting...' : 'Purchase'}
+          {loading ? 'Redirecting...' : disabled ? 'Select org to purchase' : 'Purchase'}
         </Button>
       </CardContent>
     </Card>

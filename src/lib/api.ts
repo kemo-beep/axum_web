@@ -111,4 +111,12 @@ export async function apiFetchBlob(
   return res.blob()
 }
 
+/** WebSocket base URL (ws or wss). */
+export const WS_BASE = API_BASE.replace(/^http/, 'ws')
+
+export async function getWsToken(): Promise<string> {
+  const res = await apiFetch<{ token: string }>('/v1/auth/ws-token')
+  return res.token
+}
+
 export { API_BASE }

@@ -3,6 +3,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { Button } from '#/components/ui/button'
 import { apiFetch } from '#/lib/api'
 import type { ApiError } from '#/lib/api'
+import { useOrgCredits } from '#/hooks/useOrgCredits'
 import type {
   SubscriptionPlan,
   SubscriptionWithPlan,
@@ -34,16 +35,20 @@ interface TransactionsResponse {
   credit_transactions: Array<{
     id: string
     kind: string
+    amount_tokens?: number
     amount_cents?: number
     currency?: string
     receipt_url?: string
-    occurred_at: string
+    occurred_at?: string
+    created_at?: string
   }>
 }
 
 export function OrgBillingTab({ orgId }: OrgBillingTabProps) {
   const queryClient = useQueryClient()
   const [checkoutLoading, setCheckoutLoading] = useState<string | null>(null)
+
+  const { data: credits, isLoading: creditsLoading } = useOrgCredits(orgId)
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search)
@@ -53,6 +58,9 @@ export function OrgBillingTab({ orgId }: OrgBillingTabProps) {
       })
       queryClient.invalidateQueries({
         queryKey: ['billing', 'transactions', orgId],
+      })
+      queryClient.invalidateQueries({
+        queryKey: ['billing', 'credits', orgId],
       })
       queryClient.invalidateQueries({
         queryKey: ['billing', 'subscription-status'],
@@ -143,9 +151,51 @@ export function OrgBillingTab({ orgId }: OrgBillingTabProps) {
   }
 
   const hasSubscription = subscription != null
+  const balance = credits?.balance ?? 0
+  const isLowBalance = balance <= 0
 
   return (
     <div className="space-y-8">
+      {/* Credit balance */}
+      <section className="rounded-xl border border-[var(--line)] bg-[var(--surface)] p-6">
+        <h3 className="mb-2 text-sm font-medium text-[var(--sea-ink-soft)]">
+          Credit balance
+        </h3>
+        {creditsLoading ? (
+          <p className="text-2xl font-semibold text-[var(--sea-ink)]">
+            Loading...
+          </p>
+        ) : (
+          <p className="text-2xl font-semibold text-[var(--sea-ink)]">
+            {balance.toLocaleString()} credits
+          </p>
+        )}
+      </section>
+
+      {/* Low-balance banner */}
+      {isLowBalance && !creditsLoading && (
+        <section
+          className="rounded-xl border border-amber-200 dark:border-amber-800 bg-amber-50 dark:bg-amber-950/50 p-4"
+          role="alert"
+        >
+          <p className="mb-3 text-sm font-medium text-amber-800 dark:text-amber-200">
+            Your credit balance is empty. Purchase a token package to continue
+            using features.
+          </p>
+          <Button
+            size="sm"
+            className="bg-amber-600 hover:bg-amber-700 text-white"
+            onClick={() =>
+              document
+                .getElementById('token-packages')
+                ?.scrollIntoView({ behavior: 'smooth' })
+            }
+          >
+            Buy token package
+          </Button>
+        </section>
+      )}
+
       {subscriptionLoading ? (
         <p className="text-sm text-[var(--sea-ink-soft)]">
           Loading subscription...
@@ -190,7 +240,7 @@ export function OrgBillingTab({ orgId }: OrgBillingTabProps) {
         </>
       )}
 
-      <section>
+      <section id="token-packages">
         <h3 className="mb-4 text-lg font-semibold">Token packages</h3>
         {packagesLoading ? (
           <p className="text-sm text-[var(--sea-ink-soft)]">Loading...</p>
