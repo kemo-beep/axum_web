@@ -5,26 +5,11 @@ import type { Org } from '#/types'
 import { useAuth } from '#/hooks/useAuth'
 import { Card, CardContent, CardHeader, CardTitle } from '#/components/ui/card'
 import { EmptyState } from '#/components/shared/EmptyState'
+import { PageHeader } from '#/components/shared/PageHeader'
 import { DashboardSkeleton } from '#/components/shared/PageSkeleton'
+import { staggerContainer, staggerItem } from '#/lib/animations'
 import { Building2, ArrowUpRight, FolderKey, CreditCard } from 'lucide-react'
 import { motion } from 'framer-motion'
-
-const container = {
-  hidden: { opacity: 0 },
-  show: {
-    opacity: 1,
-    transition: { staggerChildren: 0.1 },
-  },
-}
-
-const item = {
-  hidden: { opacity: 0, y: 20 },
-  show: {
-    opacity: 1,
-    y: 0,
-    transition: { type: 'spring' as const, bounce: 0.4 },
-  },
-}
 
 export function DashboardPage() {
   const { user } = useAuth()
@@ -41,48 +26,39 @@ export function DashboardPage() {
     )
   }
 
+  const headerAction = (
+    <div className="flex bg-[var(--surface-strong)] p-1.5 rounded-[1.25rem] border border-[var(--line)] shadow-sm backdrop-blur-md">
+      <Link
+        to="/orgs"
+        className="px-5 py-2.5 rounded-xl text-sm font-semibold bg-[var(--surface)] text-[var(--sea-ink)] shadow-sm border border-[var(--line)] flex items-center gap-2 transition hover:border-[var(--lagoon)] hover:text-[var(--lagoon-deep)]"
+      >
+        <Building2 className="size-4" />
+        Organizations
+      </Link>
+      <Link
+        to="/api-keys"
+        className="px-5 py-2.5 text-sm font-medium text-[var(--sea-ink-soft)] hover:text-[var(--sea-ink)] transition flex items-center gap-2 hover:bg-[var(--surface)] rounded-xl"
+      >
+        <FolderKey className="size-4" />
+        API Keys
+      </Link>
+      <Link
+        to="/billing/plans"
+        className="px-5 py-2.5 text-sm font-medium text-[var(--sea-ink-soft)] hover:text-[var(--sea-ink)] transition flex items-center gap-2 hover:bg-[var(--surface)] rounded-xl"
+      >
+        <CreditCard className="size-4" />
+        Billing
+      </Link>
+    </div>
+  )
+
   return (
     <main className="page-wrap py-10 min-h-[90vh]">
-      <motion.section
-        initial={{ opacity: 0, y: -20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5, ease: 'easeOut' }}
-        className="mb-12 flex flex-col md:flex-row md:items-end justify-between gap-4"
-      >
-        <div>
-          <h1 className="mb-2 text-4xl font-bold tracking-tight text-[var(--sea-ink)] display-title">
-            Overview
-          </h1>
-          <p className="text-base text-[var(--sea-ink-soft)] font-medium">
-            Welcome back,{' '}
-            <span className="text-[var(--sea-ink)]">{user?.email}</span>
-          </p>
-        </div>
-
-        <div className="flex bg-[var(--surface-strong)] p-1.5 rounded-[1.25rem] border border-[var(--line)] shadow-sm backdrop-blur-md">
-          <Link
-            to="/orgs"
-            className="px-5 py-2.5 rounded-xl text-sm font-semibold bg-[var(--surface)] text-[var(--sea-ink)] shadow-sm border border-[var(--line)] flex items-center gap-2 transition hover:border-[var(--lagoon)] hover:text-[var(--lagoon-deep)]"
-          >
-            <Building2 className="size-4" />
-            Organizations
-          </Link>
-          <Link
-            to="/api-keys"
-            className="px-5 py-2.5 text-sm font-medium text-[var(--sea-ink-soft)] hover:text-[var(--sea-ink)] transition flex items-center gap-2 hover:bg-[var(--surface)] rounded-xl"
-          >
-            <FolderKey className="size-4" />
-            API Keys
-          </Link>
-          <Link
-            to="/billing/plans"
-            className="px-5 py-2.5 text-sm font-medium text-[var(--sea-ink-soft)] hover:text-[var(--sea-ink)] transition flex items-center gap-2 hover:bg-[var(--surface)] rounded-xl"
-          >
-            <CreditCard className="size-4" />
-            Billing
-          </Link>
-        </div>
-      </motion.section>
+      <PageHeader
+        title="Overview"
+        subtitle={`Welcome back, ${user?.email ?? ''}`}
+        action={headerAction}
+      />
 
       <section className="mb-12">
         <div className="flex items-center justify-between mb-8">
@@ -102,13 +78,13 @@ export function DashboardPage() {
 
         {orgs && orgs.length > 0 ? (
           <motion.div
-            variants={container}
+            variants={staggerContainer}
             initial="hidden"
             animate="show"
             className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4"
           >
             {orgs.map((org) => (
-              <motion.div key={org.id} variants={item}>
+              <motion.div key={org.id} variants={staggerItem}>
                 <Link
                   to="/orgs/$orgId"
                   params={{ orgId: org.id }}

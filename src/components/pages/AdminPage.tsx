@@ -2,19 +2,16 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '#/components/ui/tabs'
 import { JobStatsSection } from '#/components/features/admin/JobStatsSection'
 import { FeatureFlagsSection } from '#/components/features/admin/FeatureFlagsSection'
 import { ImpersonateSection } from '#/components/features/admin/ImpersonateSection'
+import { PageHeader } from '#/components/shared/PageHeader'
 import { BarChart3, Flag, UserCog } from 'lucide-react'
 
 export function AdminPage() {
   return (
     <main className="page-wrap py-8 min-h-[90vh]">
-      <div className="mb-8">
-        <h1 className="text-4xl font-bold tracking-tight text-[var(--sea-ink)] display-title">
-          Admin Dashboard
-        </h1>
-        <p className="mt-2 text-base text-[var(--sea-ink-soft)] font-medium">
-          Job stats, feature flags, and user impersonation.
-        </p>
-      </div>
+      <PageHeader
+        title="Admin Dashboard"
+        subtitle="Job stats, feature flags, and user impersonation."
+      />
 
       <Tabs defaultValue="job-stats" className="w-full">
         <TabsList className="mb-6 bg-[var(--surface-strong)] border border-[var(--line)] p-1 rounded-xl">

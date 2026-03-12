@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { Link, useNavigate } from '@tanstack/react-router'
 import { useMutation } from '@tanstack/react-query'
 import { Button } from '#/components/ui/button'
+import { InlineErrorBanner } from '#/components/shared/InlineErrorBanner'
 import {
   CardContent,
   CardDescription,
@@ -76,18 +77,7 @@ export function AcceptInvitePage({ token = '' }: AcceptInvitePageProps) {
           </CardDescription>
         </CardHeader>
         <CardContent>
-          {error && (
-            <motion.div
-              initial={{ opacity: 0, y: -10 }}
-              animate={{ opacity: 1, y: 0 }}
-              className="mb-6 rounded-xl border border-red-200 bg-red-50 p-4 text-sm font-medium text-red-700 shadow-sm dark:border-red-900/50 dark:bg-red-900/20 dark:text-red-400"
-            >
-              <span className="flex items-center gap-2">
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="w-5 h-5"><path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-8-5a.75.75 0 01.75.75v4.5a.75.75 0 01-1.5 0v-4.5A.75.75 0 0110 5zm0 10a1 1 0 100-2 1 1 0 000 2z" clipRule="evenodd" /></svg>
-                {error}
-              </span>
-            </motion.div>
-          )}
+          {error && <InlineErrorBanner message={error} />}
           <Button
             className="w-full h-12 rounded-xl bg-[var(--lagoon)] hover:bg-[var(--lagoon-deep)] text-white font-semibold text-md transition-all shadow-md hover:shadow-lg hover:-translate-y-0.5"
             onClick={() => acceptMutation.mutate()}

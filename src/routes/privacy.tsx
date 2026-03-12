@@ -1,5 +1,6 @@
 import { createFileRoute } from '@tanstack/react-router'
 import { createSeoMeta } from '#/lib/seo'
+import { PrivacyPage } from '#/components/pages/PrivacyPage'
 
 export const Route = createFileRoute('/privacy')({
   head: () => {
@@ -10,9 +11,5 @@ export const Route = createFileRoute('/privacy')({
     })
     return { meta, links }
   },
-  component: RouteComponent,
+  component: PrivacyPage,
 })
-
-function RouteComponent() {
-  return <div>Hello "/privacy"!</div>
-}

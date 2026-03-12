@@ -19,6 +19,7 @@ import { WorkspaceList } from '#/components/features/orgs/WorkspaceList'
 import { OrgBillingTab } from '#/components/features/billing/OrgBillingTab'
 import { Breadcrumbs } from '#/components/shared/Breadcrumbs'
 import { OrgDetailSkeleton } from '#/components/shared/PageSkeleton'
+import { tabVariants } from '#/lib/animations'
 import { motion, AnimatePresence } from 'framer-motion'
 
 type OrgDetailPageProps = {
@@ -59,13 +60,6 @@ export function OrgDetailPage({ tab }: OrgDetailPageProps) {
         <OrgDetailSkeleton />
       </main>
     )
-  }
-
-  // Animation variants
-  const tabVariants = {
-    hidden: { opacity: 0, y: 10 },
-    enter: { opacity: 1, y: 0, transition: { duration: 0.4, ease: "easeOut" as const } },
-    exit: { opacity: 0, y: -10, transition: { duration: 0.2 } },
   }
 
   return (

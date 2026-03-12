@@ -1,66 +1,34 @@
-import { useQuery } from '@tanstack/react-query'
-import { apiFetch } from '#/lib/api'
-import type { SubscriptionPlan, TokenPackage } from '#/types'
+import { useBillingPlans, useBillingPackages } from '#/hooks/useBilling'
 import { Card, CardContent, CardHeader } from '#/components/ui/card'
 import { Link } from '@tanstack/react-router'
 import { motion } from 'framer-motion'
+import { formatPrice } from '#/lib/format'
+import {
+  staggerContainerSlow,
+  staggerItemY30,
+} from '#/lib/animations'
+import { PageHeader } from '#/components/shared/PageHeader'
 import { Check, CreditCard, Sparkles } from 'lucide-react'
 
-// Layout stagger animations
-const container = {
-  hidden: { opacity: 0 },
-  show: {
-    opacity: 1,
-    transition: { staggerChildren: 0.15 }
-  }
-}
-
-const item = {
-  hidden: { opacity: 0, y: 30 },
-  show: { opacity: 1, y: 0, transition: { type: "spring" as const, bounce: 0.3 } }
-}
-
 export function PlansPage() {
-  const { data: plans, isLoading: plansLoading } = useQuery({
-    queryKey: ['billing', 'plans'],
-    queryFn: () => apiFetch<SubscriptionPlan[]>('/v1/billing/plans'),
-  })
-
-  const { data: packages, isLoading: packagesLoading } = useQuery({
-    queryKey: ['billing', 'packages'],
-    queryFn: () => apiFetch<TokenPackage[]>('/v1/billing/packages'),
-  })
-
-  const formatPrice = (cents: number, currency: string) =>
-    new Intl.NumberFormat('en-US', {
-      style: 'currency',
-      currency: (currency || 'usd').toUpperCase(),
-    }).format(cents / 100)
+  const { data: plans, isLoading: plansLoading } = useBillingPlans()
+  const { data: packages, isLoading: packagesLoading } = useBillingPackages()
 
   return (
     <main className="page-wrap px-4 pb-12 pt-14 min-h-[90vh]">
-      <motion.div
-        initial={{ opacity: 0, y: -20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5, ease: "easeOut" }}
-        className="mb-12 flex flex-col md:flex-row md:items-end justify-between gap-4 border-b border-[var(--line)] pb-6"
-      >
-        <div>
-          <h1 className="text-4xl font-bold tracking-tight text-[var(--sea-ink)] display-title">
-            Billing & Plans
-          </h1>
-          <p className="mt-2 text-[var(--sea-ink-soft)] text-base max-w-xl">
-            Subscribe to a tier that fits your scale or purchase flexible token packages. Billing is managed securely per organization.
-          </p>
-        </div>
-        <Link
-          to="/orgs"
-          className="h-11 inline-flex items-center rounded-xl bg-[var(--surface-strong)] border border-[var(--line)] shadow-sm px-6 text-sm font-semibold text-[var(--sea-ink)] hover:text-[var(--lagoon-deep)] hover:border-[var(--lagoon)]/50 transition-all hover:shadow-md hover:-translate-y-0.5"
-        >
-          <CreditCard className="mr-2 size-4.5 text-[var(--lagoon)]" />
-          Manage Organizations
-        </Link>
-      </motion.div>
+      <PageHeader
+        title="Billing & Plans"
+        subtitle="Subscribe to a tier that fits your scale or purchase flexible token packages. Billing is managed securely per organization."
+        action={
+          <Link
+            to="/orgs"
+            className="h-11 inline-flex items-center rounded-xl bg-[var(--surface-strong)] border border-[var(--line)] shadow-sm px-6 text-sm font-semibold text-[var(--sea-ink)] hover:text-[var(--lagoon-deep)] hover:border-[var(--lagoon)]/50 transition-all hover:shadow-md hover:-translate-y-0.5"
+          >
+            <CreditCard className="mr-2 size-4.5 text-[var(--lagoon)]" />
+            Manage Organizations
+          </Link>
+        }
+      />
 
       <section className="mb-16">
         <motion.div
@@ -70,29 +38,36 @@ export function PlansPage() {
           className="flex items-center gap-2 mb-6"
         >
           <Sparkles className="size-5 text-[var(--lagoon)]" />
-          <h2 className="text-2xl font-bold text-[var(--sea-ink)] display-title">Subscription Tiers</h2>
+          <h2 className="text-2xl font-bold text-[var(--sea-ink)] display-title">
+            Subscription Tiers
+          </h2>
         </motion.div>
 
         {plansLoading ? (
           <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-            {[1, 2, 3].map(i => (
-              <div key={i} className="h-[400px] rounded-3xl bg-[var(--surface-strong)] animate-pulse border border-[var(--line)]" />
+            {[1, 2, 3].map((i) => (
+              <div
+                key={i}
+                className="h-[400px] rounded-3xl bg-[var(--surface-strong)] animate-pulse border border-[var(--line)]"
+              />
             ))}
           </div>
         ) : plans && plans.length > 0 ? (
           <motion.div
-            variants={container}
+            variants={staggerContainerSlow}
             initial="hidden"
             animate="show"
             className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3"
           >
             {plans.map((plan) => (
-              <motion.div key={plan.id} variants={item} className="h-full">
+              <motion.div key={plan.id} variants={staggerItemY30} className="h-full">
                 <Card className="h-full relative overflow-hidden rounded-3xl border border-[var(--line)] bg-[var(--surface-strong)] backdrop-blur-xl shadow-lg hover:shadow-2xl hover:shadow-[var(--lagoon)]/10 hover:border-[var(--lagoon)]/30 transition-all duration-500 group">
                   <div className="absolute top-0 right-0 w-32 h-32 bg-[var(--lagoon)]/5 rounded-full blur-3xl -mr-10 -mt-10 group-hover:bg-[var(--lagoon)]/20 transition-colors duration-500" />
 
                   <CardHeader className="p-8 pb-6 border-b border-[var(--line)]/50 bg-gradient-to-br from-white/40 to-transparent">
-                    <span className="text-sm font-bold tracking-widest uppercase text-[var(--lagoon)] mb-2 block">{plan.name}</span>
+                    <span className="text-sm font-bold tracking-widest uppercase text-[var(--lagoon)] mb-2 block">
+                      {plan.name}
+                    </span>
                     <div className="flex items-baseline gap-1 text-[var(--sea-ink)]">
                       <span className="text-4xl font-bold tracking-tight">
                         {formatPrice(plan.amount_cents, plan.currency)}
@@ -110,7 +85,10 @@ export function PlansPage() {
                     {plan.features && Array.isArray(plan.features) && (
                       <ul className="space-y-4 mb-8">
                         {(plan.features as string[]).map((f: string, i: number) => (
-                          <li key={i} className="flex items-start gap-3 text-[15px] text-[var(--sea-ink)] font-medium">
+                          <li
+                            key={i}
+                            className="flex items-start gap-3 text-[15px] text-[var(--sea-ink)] font-medium"
+                          >
                             <Check className="size-5 shrink-0 text-[var(--lagoon)]" />
                             <span>{f}</span>
                           </li>
@@ -119,7 +97,7 @@ export function PlansPage() {
                     )}
                     <div className="mt-8 pt-6 border-t border-[var(--line)]/50">
                       <p className="text-sm font-medium text-[var(--sea-ink-soft)] bg-[var(--sea-ink)]/5 p-3 rounded-xl border border-[var(--line)] text-center">
-                        Subscribe from an organization's Billing tab.
+                        Subscribe from an organization&apos;s Billing tab.
                       </p>
                     </div>
                   </CardContent>
@@ -146,23 +124,28 @@ export function PlansPage() {
 
         {packagesLoading ? (
           <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
-            {[1, 2].map(i => (
-              <div key={i} className="h-32 rounded-3xl bg-[var(--surface-strong)] animate-pulse border border-[var(--line)]" />
+            {[1, 2].map((i) => (
+              <div
+                key={i}
+                className="h-32 rounded-3xl bg-[var(--surface-strong)] animate-pulse border border-[var(--line)]"
+              />
             ))}
           </div>
         ) : packages && packages.length > 0 ? (
           <motion.div
-            variants={container}
+            variants={staggerContainerSlow}
             initial="hidden"
             animate="show"
             className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4"
           >
             {packages.map((pkg) => (
-              <motion.div key={pkg.id} variants={item}>
+              <motion.div key={pkg.id} variants={staggerItemY30}>
                 <Card className="rounded-2xl border border-[var(--line)] bg-[var(--surface-strong)] backdrop-blur-xl shadow-sm hover:shadow-lg hover:-translate-y-1 transition-all group overflow-hidden relative">
                   <div className="absolute inset-0 bg-gradient-to-br from-[var(--lagoon)]/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
                   <CardHeader className="p-6 pb-2 relative z-10">
-                    <span className="text-sm font-semibold tracking-wide text-[var(--sea-ink-soft)] group-hover:text-[var(--lagoon)] transition-colors">{pkg.name}</span>
+                    <span className="text-sm font-semibold tracking-wide text-[var(--sea-ink-soft)] group-hover:text-[var(--lagoon)] transition-colors">
+                      {pkg.name}
+                    </span>
                     <span className="text-3xl font-bold tracking-tight text-[var(--sea-ink)] block mt-1">
                       {formatPrice(pkg.amount_cents, pkg.currency ?? 'usd')}
                     </span>
@@ -170,7 +153,9 @@ export function PlansPage() {
                   <CardContent className="p-6 pt-2 relative z-10">
                     <div className="mt-4 flex items-center justify-between text-sm font-semibold text-[var(--sea-ink)] border-t border-[var(--line)] pt-3">
                       <span>Volume allocation</span>
-                      <span className="px-2.5 py-1 bg-[var(--sea-ink)]/5 rounded-md">{pkg.tokens.toLocaleString()} tokens</span>
+                      <span className="px-2.5 py-1 bg-[var(--sea-ink)]/5 rounded-md">
+                        {pkg.tokens.toLocaleString()} tokens
+                      </span>
                     </div>
                   </CardContent>
                 </Card>

@@ -1,139 +1,66 @@
-import { useEffect, useState } from 'react'
-import { useQuery, useQueryClient } from '@tanstack/react-query'
-import { apiFetch } from '#/lib/api'
-import type { ApiError } from '#/lib/api'
-import type { SubscriptionPlan, SubscriptionWithPlan, TokenPackage } from '#/types'
-import { useOrg } from '#/hooks/useOrg'
 import { Link } from '@tanstack/react-router'
 import { PlanCard } from '#/components/features/billing/PlanCard'
 import { PackageCard } from '#/components/features/billing/PackageCard'
-import { CreditCard, Coins, Building2 } from 'lucide-react'
+import { useOrg } from '#/hooks/useOrg'
+import {
+  useBillingPlans,
+  useBillingPackages,
+  useBillingSubscription,
+  useStoreCheckout,
+} from '#/hooks/useBilling'
+import { PageHeader } from '#/components/shared/PageHeader'
+import { Building2, CreditCard, Coins } from 'lucide-react'
 
 export function StorePage() {
-  const queryClient = useQueryClient()
   const { selectedOrgId } = useOrg()
-  const [checkoutLoading, setCheckoutLoading] = useState<string | null>(null)
+  const orgId = selectedOrgId ?? undefined
+  const { data: plans, isLoading: plansLoading } = useBillingPlans()
+  const { data: packages, isLoading: packagesLoading } = useBillingPackages()
+  const { data: subscription } = useBillingSubscription(orgId)
+  const {
+    handleCheckout,
+    handleChangePlan,
+    checkoutLoading,
+    changePlanLoading,
+  } = useStoreCheckout(orgId)
 
-  useEffect(() => {
-    const params = new URLSearchParams(window.location.search)
-    if (params.get('billing') === 'success' && selectedOrgId) {
-      queryClient.invalidateQueries({ queryKey: ['billing', 'subscription', selectedOrgId] })
-      queryClient.invalidateQueries({ queryKey: ['billing', 'credits', selectedOrgId] })
-      queryClient.invalidateQueries({ queryKey: ['billing', 'transactions', selectedOrgId] })
-      queryClient.invalidateQueries({ queryKey: ['billing', 'subscription-status'] })
-      window.history.replaceState({}, '', '/store')
-    }
-  }, [selectedOrgId, queryClient])
-
-  const { data: plans, isLoading: plansLoading } = useQuery({
-    queryKey: ['billing', 'plans'],
-    queryFn: () => apiFetch<SubscriptionPlan[]>('/v1/billing/plans'),
-  })
-
-  const { data: subscription } = useQuery({
-    queryKey: ['billing', 'subscription', selectedOrgId],
-    queryFn: async (): Promise<SubscriptionWithPlan | null> => {
-      if (!selectedOrgId) return null
-      try {
-        return await apiFetch<SubscriptionWithPlan>(
-          `/v1/orgs/${selectedOrgId}/billing/subscription`,
-        )
-      } catch (e) {
-        const err = e as ApiError
-        if (err.status === 404) return null
-        throw e
-      }
-    },
-    enabled: !!selectedOrgId,
-  })
-
-  const { data: packages, isLoading: packagesLoading } = useQuery({
-    queryKey: ['billing', 'packages'],
-    queryFn: () => apiFetch<TokenPackage[]>('/v1/billing/packages'),
-  })
-
-  const [changePlanLoading, setChangePlanLoading] = useState<string | null>(null)
-
-  const handleCheckout = async (
-    priceId: string,
-    mode: 'subscription' | 'payment',
-  ) => {
-    if (!selectedOrgId) return
-    setCheckoutLoading(priceId)
-    try {
-      const { url } = await apiFetch<{ url: string }>(
-        `/v1/orgs/${selectedOrgId}/billing/checkout`,
-        {
-          method: 'POST',
-          body: JSON.stringify({
-            mode,
-            price_id: priceId,
-            success_url: `${window.location.origin}/store?billing=success`,
-            cancel_url: `${window.location.origin}/store?billing=canceled`,
-          }),
-        },
-      )
-      window.location.href = url
-    } catch {
-      setCheckoutLoading(null)
-    }
-  }
-
-  const handleChangePlan = async (priceId: string) => {
-    if (!selectedOrgId) return
-    setChangePlanLoading(priceId)
-    try {
-      await apiFetch(`/v1/orgs/${selectedOrgId}/billing/subscription/change-plan`, {
-        method: 'POST',
-        body: JSON.stringify({ price_id: priceId }),
-      })
-      queryClient.invalidateQueries({ queryKey: ['billing', 'subscription', selectedOrgId] })
-      queryClient.invalidateQueries({ queryKey: ['billing', 'transactions', selectedOrgId] })
-      queryClient.invalidateQueries({ queryKey: ['billing', 'subscription-status'] })
-    } finally {
-      setChangePlanLoading(null)
-    }
-  }
+  const headerAction = orgId ? (
+    <Link
+      to="/orgs/$orgId"
+      params={{ orgId }}
+      search={{ tab: 'billing' }}
+      className="text-sm font-medium text-[var(--lagoon)] hover:underline"
+    >
+      View billing & transactions
+    </Link>
+  ) : (
+    <Link
+      to="/orgs"
+      className="inline-flex items-center gap-2 rounded-lg border border-[var(--line)] bg-[var(--surface)] px-4 py-2 text-sm font-medium text-[var(--sea-ink)] hover:bg-[var(--line)]/30"
+    >
+      <Building2 className="size-4" />
+      Select organization to purchase
+    </Link>
+  )
 
   return (
     <main className="page-wrap px-4 pb-12 pt-14 min-h-[90vh]">
-      <div className="mb-10 flex flex-col md:flex-row md:items-end justify-between gap-4 border-b border-[var(--line)] pb-6">
-        <div>
-          <h1 className="text-3xl font-bold tracking-tight text-[var(--sea-ink)]">
-            Store
-          </h1>
-          <p className="mt-1.5 text-[var(--sea-ink-soft)] text-sm max-w-xl">
-            Subscribe to a plan or purchase token packages. Billing is per organization.
-          </p>
-        </div>
-        {selectedOrgId ? (
-          <Link
-            to="/orgs/$orgId"
-            params={{ orgId: selectedOrgId }}
-            search={{ tab: 'billing' }}
-            className="text-sm font-medium text-[var(--lagoon)] hover:underline"
-          >
-            View billing & transactions
-          </Link>
-        ) : (
-          <Link
-            to="/orgs"
-            className="inline-flex items-center gap-2 rounded-lg border border-[var(--line)] bg-[var(--surface)] px-4 py-2 text-sm font-medium text-[var(--sea-ink)] hover:bg-[var(--line)]/30"
-          >
-            <Building2 className="size-4" />
-            Select organization to purchase
-          </Link>
-        )}
-      </div>
+      <PageHeader
+        title="Store"
+        subtitle="Subscribe to a plan or purchase token packages. Billing is per organization."
+        action={headerAction}
+        size="sm"
+      />
 
-      {/* Subscription plans (recurring) */}
       <section className="mb-12">
         <div className="mb-6 flex items-center gap-2">
           <CreditCard className="size-5 text-[var(--lagoon)]" />
           <h2 className="text-xl font-semibold text-[var(--sea-ink)]">
             Subscription plans
           </h2>
-          <span className="text-xs text-[var(--sea-ink-soft)]">(recurring billing)</span>
+          <span className="text-xs text-[var(--sea-ink-soft)]">
+            (recurring billing)
+          </span>
         </div>
 
         {plansLoading ? (
@@ -151,7 +78,7 @@ export function StorePage() {
               <PlanCard
                 key={plan.id}
                 plan={plan}
-                orgId={selectedOrgId ?? ''}
+                orgId={orgId ?? ''}
                 onCheckout={(priceId) => handleCheckout(priceId, 'subscription')}
                 loading={checkoutLoading === plan.stripe_price_id}
                 currentPlanId={subscription?.plan?.id}
@@ -168,14 +95,15 @@ export function StorePage() {
         )}
       </section>
 
-      {/* Token packages (one-time purchase) */}
       <section>
         <div className="mb-6 flex items-center gap-2">
           <Coins className="size-5 text-[var(--lagoon)]" />
           <h2 className="text-xl font-semibold text-[var(--sea-ink)]">
             Token packages
           </h2>
-          <span className="text-xs text-[var(--sea-ink-soft)]">(one-time purchase, adds credits)</span>
+          <span className="text-xs text-[var(--sea-ink-soft)]">
+            (one-time purchase, adds credits)
+          </span>
         </div>
 
         {packagesLoading ? (
@@ -193,10 +121,10 @@ export function StorePage() {
               <PackageCard
                 key={pkg.id}
                 pkg={pkg}
-                orgId={selectedOrgId ?? ''}
+                orgId={orgId ?? ''}
                 onCheckout={(priceId) => handleCheckout(priceId, 'payment')}
                 loading={checkoutLoading === pkg.stripe_price_id}
-                disabled={!selectedOrgId}
+                disabled={!orgId}
               />
             ))}
           </div>

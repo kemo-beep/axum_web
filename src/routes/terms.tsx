@@ -1,5 +1,6 @@
 import { createFileRoute } from '@tanstack/react-router'
 import { createSeoMeta } from '#/lib/seo'
+import { TermsPage } from '#/components/pages/TermsPage'
 
 export const Route = createFileRoute('/terms')({
   head: () => {
@@ -10,9 +11,5 @@ export const Route = createFileRoute('/terms')({
     })
     return { meta, links }
   },
-  component: RouteComponent,
+  component: TermsPage,
 })
-
-function RouteComponent() {
-  return <div>Hello "/terms"!</div>
-}

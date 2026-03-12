@@ -14,6 +14,8 @@ import type { ApiKeyInfo } from '#/types'
 import { ApiKeyTable } from '#/components/features/api-keys/ApiKeyTable'
 import { CreateApiKeyForm } from '#/components/features/api-keys/CreateApiKeyForm'
 import { EmptyState } from '#/components/shared/EmptyState'
+import { InlineErrorBanner } from '#/components/shared/InlineErrorBanner'
+import { PageHeader } from '#/components/shared/PageHeader'
 import { TableSkeleton } from '#/components/shared/PageSkeleton'
 import { Key, Plus, ShieldCheck } from 'lucide-react'
 import { motion } from 'framer-motion'
@@ -42,34 +44,24 @@ export function ApiKeysPage() {
 
   return (
     <main className="page-wrap py-10 min-h-[90vh]">
-      <motion.div
-        initial={{ opacity: 0, y: -20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5, ease: "easeOut" }}
-        className="mb-10 flex flex-col md:flex-row md:items-end justify-between gap-4 border-b border-[var(--line)] pb-6"
-      >
-        <div>
-          <h1 className="text-4xl font-bold tracking-tight text-[var(--sea-ink)] display-title">
-            API Keys
-          </h1>
-          <p className="mt-2 text-[var(--sea-ink-soft)] text-base">
-            Manage secure programmatic access. Keep your keys secret.
-          </p>
-        </div>
-        <Button onClick={() => setCreateOpen(true)} className="h-11 rounded-xl bg-[var(--lagoon)] hover:bg-[var(--lagoon-deep)] text-white shadow-md hover:shadow-lg transition-all hover:-translate-y-0.5 font-semibold px-6">
-          <Plus className="mr-2 size-4.5" />
-          Create API Key
-        </Button>
-      </motion.div>
+      <PageHeader
+        title="API Keys"
+        subtitle="Manage secure programmatic access. Keep your keys secret."
+        action={
+          <Button
+            onClick={() => setCreateOpen(true)}
+            className="h-11 rounded-xl bg-[var(--lagoon)] hover:bg-[var(--lagoon-deep)] text-white shadow-md hover:shadow-lg transition-all hover:-translate-y-0.5 font-semibold px-6"
+          >
+            <Plus className="mr-2 size-4.5" />
+            Create API Key
+          </Button>
+        }
+      />
 
       {error && (
-        <motion.div
-          initial={{ opacity: 0, scale: 0.95 }}
-          animate={{ opacity: 1, scale: 1 }}
-          className="mb-6 rounded-xl border border-red-200 bg-red-50 p-4 text-sm font-medium text-red-700 shadow-sm dark:border-red-900/50 dark:bg-red-900/20 dark:text-red-400"
-        >
-          {error}
-        </motion.div>
+        <div className="mb-6">
+          <InlineErrorBanner message={error} />
+        </div>
       )}
 
       {isLoading ? (

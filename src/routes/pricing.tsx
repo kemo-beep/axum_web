@@ -1,5 +1,6 @@
 import { createFileRoute } from '@tanstack/react-router'
 import { createSeoMeta } from '#/lib/seo'
+import { PricingPage } from '#/components/pages/PricingPage'
 
 export const Route = createFileRoute('/pricing')({
   head: () => {
@@ -10,9 +11,5 @@ export const Route = createFileRoute('/pricing')({
     })
     return { meta, links }
   },
-  component: RouteComponent,
+  component: PricingPage,
 })
-
-function RouteComponent() {
-  return <div>Hello "/pricing"!</div>
-}
