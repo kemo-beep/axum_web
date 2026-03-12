@@ -11,6 +11,7 @@ import { AuthProvider } from '../contexts/AuthContext'
 import { OrgProvider } from '../contexts/OrgContext'
 import TanStackQueryProvider from '../integrations/tanstack-query/root-provider'
 import appCss from '../styles.css?url'
+import { createSeoMeta, SITE_URL } from '../lib/seo'
 import type { QueryClient } from '@tanstack/react-query'
 
 interface MyRouterContext {
@@ -20,26 +21,29 @@ interface MyRouterContext {
 const THEME_INIT_SCRIPT = `(function(){try{var stored=window.localStorage.getItem('theme');var mode=(stored==='light'||stored==='dark'||stored==='auto')?stored:'auto';var prefersDark=window.matchMedia('(prefers-color-scheme: dark)').matches;var resolved=mode==='auto'?(prefersDark?'dark':'light'):mode;var root=document.documentElement;root.classList.remove('light','dark');root.classList.add(resolved);if(mode==='auto'){root.removeAttribute('data-theme')}else{root.setAttribute('data-theme',mode)}root.style.colorScheme=resolved;}catch(e){}})();`
 
 export const Route = createRootRouteWithContext<MyRouterContext>()({
-  head: () => ({
-    meta: [
-      {
-        charSet: 'utf-8',
-      },
-      {
-        name: 'viewport',
-        content: 'width=device-width, initial-scale=1',
-      },
-      {
-        title: 'SaaS App',
-      },
-    ],
-    links: [
-      {
-        rel: 'stylesheet',
-        href: appCss,
-      },
-    ],
-  }),
+  head: () => {
+    const { meta, links } = createSeoMeta({})
+    const jsonLd = {
+      '@context': 'https://schema.org',
+      '@type': 'WebSite',
+      name: 'SaaS App',
+      url: SITE_URL,
+    }
+    return {
+      meta: [
+        { charSet: 'utf-8' },
+        { name: 'viewport', content: 'width=device-width, initial-scale=1' },
+        ...meta,
+      ],
+      links: [{ rel: 'stylesheet', href: appCss }, ...links],
+      scripts: [
+        {
+          type: 'application/ld+json',
+          children: JSON.stringify(jsonLd),
+        },
+      ],
+    }
+  },
   ssr: false,
   errorComponent: ({ error }) => (
     <div className="flex min-h-screen flex-col items-center justify-center gap-4 p-8 text-center">

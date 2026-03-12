@@ -28,8 +28,10 @@ import { Route as ApiKeysRouteImport } from './routes/api-keys'
 import { Route as AboutRouteImport } from './routes/about'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as OrgsIndexRouteImport } from './routes/orgs/index'
+import { Route as BlogIndexRouteImport } from './routes/blog/index'
 import { Route as OrgsOrgIdRouteImport } from './routes/orgs/$orgId'
 import { Route as InvitesAcceptRouteImport } from './routes/invites/accept'
+import { Route as BlogSlugRouteImport } from './routes/blog/$slug'
 import { Route as BillingPortalRouteImport } from './routes/billing/portal'
 import { Route as BillingPlansRouteImport } from './routes/billing/plans'
 
@@ -128,6 +130,11 @@ const OrgsIndexRoute = OrgsIndexRouteImport.update({
   path: '/orgs/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const BlogIndexRoute = BlogIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => BlogRoute,
+} as any)
 const OrgsOrgIdRoute = OrgsOrgIdRouteImport.update({
   id: '/orgs/$orgId',
   path: '/orgs/$orgId',
@@ -137,6 +144,11 @@ const InvitesAcceptRoute = InvitesAcceptRouteImport.update({
   id: '/invites/accept',
   path: '/invites/accept',
   getParentRoute: () => rootRouteImport,
+} as any)
+const BlogSlugRoute = BlogSlugRouteImport.update({
+  id: '/$slug',
+  path: '/$slug',
+  getParentRoute: () => BlogRoute,
 } as any)
 const BillingPortalRoute = BillingPortalRouteImport.update({
   id: '/billing/portal',
@@ -153,7 +165,7 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
   '/api-keys': typeof ApiKeysRoute
-  '/blog': typeof BlogRoute
+  '/blog': typeof BlogRouteWithChildren
   '/careers': typeof CareersRoute
   '/changelog': typeof ChangelogRoute
   '/contact': typeof ContactRoute
@@ -170,15 +182,16 @@ export interface FileRoutesByFullPath {
   '/terms': typeof TermsRoute
   '/billing/plans': typeof BillingPlansRoute
   '/billing/portal': typeof BillingPortalRoute
+  '/blog/$slug': typeof BlogSlugRoute
   '/invites/accept': typeof InvitesAcceptRoute
   '/orgs/$orgId': typeof OrgsOrgIdRoute
+  '/blog/': typeof BlogIndexRoute
   '/orgs/': typeof OrgsIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
   '/api-keys': typeof ApiKeysRoute
-  '/blog': typeof BlogRoute
   '/careers': typeof CareersRoute
   '/changelog': typeof ChangelogRoute
   '/contact': typeof ContactRoute
@@ -195,8 +208,10 @@ export interface FileRoutesByTo {
   '/terms': typeof TermsRoute
   '/billing/plans': typeof BillingPlansRoute
   '/billing/portal': typeof BillingPortalRoute
+  '/blog/$slug': typeof BlogSlugRoute
   '/invites/accept': typeof InvitesAcceptRoute
   '/orgs/$orgId': typeof OrgsOrgIdRoute
+  '/blog': typeof BlogIndexRoute
   '/orgs': typeof OrgsIndexRoute
 }
 export interface FileRoutesById {
@@ -204,7 +219,7 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
   '/api-keys': typeof ApiKeysRoute
-  '/blog': typeof BlogRoute
+  '/blog': typeof BlogRouteWithChildren
   '/careers': typeof CareersRoute
   '/changelog': typeof ChangelogRoute
   '/contact': typeof ContactRoute
@@ -221,8 +236,10 @@ export interface FileRoutesById {
   '/terms': typeof TermsRoute
   '/billing/plans': typeof BillingPlansRoute
   '/billing/portal': typeof BillingPortalRoute
+  '/blog/$slug': typeof BlogSlugRoute
   '/invites/accept': typeof InvitesAcceptRoute
   '/orgs/$orgId': typeof OrgsOrgIdRoute
+  '/blog/': typeof BlogIndexRoute
   '/orgs/': typeof OrgsIndexRoute
 }
 export interface FileRouteTypes {
@@ -248,15 +265,16 @@ export interface FileRouteTypes {
     | '/terms'
     | '/billing/plans'
     | '/billing/portal'
+    | '/blog/$slug'
     | '/invites/accept'
     | '/orgs/$orgId'
+    | '/blog/'
     | '/orgs/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
     | '/about'
     | '/api-keys'
-    | '/blog'
     | '/careers'
     | '/changelog'
     | '/contact'
@@ -273,8 +291,10 @@ export interface FileRouteTypes {
     | '/terms'
     | '/billing/plans'
     | '/billing/portal'
+    | '/blog/$slug'
     | '/invites/accept'
     | '/orgs/$orgId'
+    | '/blog'
     | '/orgs'
   id:
     | '__root__'
@@ -298,8 +318,10 @@ export interface FileRouteTypes {
     | '/terms'
     | '/billing/plans'
     | '/billing/portal'
+    | '/blog/$slug'
     | '/invites/accept'
     | '/orgs/$orgId'
+    | '/blog/'
     | '/orgs/'
   fileRoutesById: FileRoutesById
 }
@@ -307,7 +329,7 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AboutRoute: typeof AboutRoute
   ApiKeysRoute: typeof ApiKeysRoute
-  BlogRoute: typeof BlogRoute
+  BlogRoute: typeof BlogRouteWithChildren
   CareersRoute: typeof CareersRoute
   ChangelogRoute: typeof ChangelogRoute
   ContactRoute: typeof ContactRoute
@@ -464,6 +486,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof OrgsIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/blog/': {
+      id: '/blog/'
+      path: '/'
+      fullPath: '/blog/'
+      preLoaderRoute: typeof BlogIndexRouteImport
+      parentRoute: typeof BlogRoute
+    }
     '/orgs/$orgId': {
       id: '/orgs/$orgId'
       path: '/orgs/$orgId'
@@ -477,6 +506,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/invites/accept'
       preLoaderRoute: typeof InvitesAcceptRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/blog/$slug': {
+      id: '/blog/$slug'
+      path: '/$slug'
+      fullPath: '/blog/$slug'
+      preLoaderRoute: typeof BlogSlugRouteImport
+      parentRoute: typeof BlogRoute
     }
     '/billing/portal': {
       id: '/billing/portal'
@@ -495,11 +531,23 @@ declare module '@tanstack/react-router' {
   }
 }
 
+interface BlogRouteChildren {
+  BlogSlugRoute: typeof BlogSlugRoute
+  BlogIndexRoute: typeof BlogIndexRoute
+}
+
+const BlogRouteChildren: BlogRouteChildren = {
+  BlogSlugRoute: BlogSlugRoute,
+  BlogIndexRoute: BlogIndexRoute,
+}
+
+const BlogRouteWithChildren = BlogRoute._addFileChildren(BlogRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AboutRoute: AboutRoute,
   ApiKeysRoute: ApiKeysRoute,
-  BlogRoute: BlogRoute,
+  BlogRoute: BlogRouteWithChildren,
   CareersRoute: CareersRoute,
   ChangelogRoute: ChangelogRoute,
   ContactRoute: ContactRoute,
