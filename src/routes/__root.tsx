@@ -44,7 +44,6 @@ export const Route = createRootRouteWithContext<MyRouterContext>()({
       ],
     }
   },
-  ssr: false,
   errorComponent: ({ error }) => (
     <div className="flex min-h-screen flex-col items-center justify-center gap-4 p-8 text-center">
       <h1 className="text-xl font-semibold text-red-600">Something went wrong</h1>

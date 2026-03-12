@@ -21,7 +21,7 @@ import {
 import { Button } from '#/components/ui/button'
 import { useAuth } from '#/hooks/useAuth'
 import { useOrg } from '#/hooks/useOrg'
-import { APP_NAV } from '#/data/nav'
+import { ADMIN_NAV, APP_NAV } from '#/data/nav'
 import { CreateOrgForm } from '#/components/features/orgs/CreateOrgForm'
 import {
   LayoutDashboard,
@@ -33,17 +33,21 @@ import {
   Check,
   Settings,
   Coins,
+  ShieldCheck,
+  Sparkles,
 } from 'lucide-react'
 import { cn } from '#/lib/utils'
 import { useSidebar } from './SidebarContext'
 import { useOrgCredits } from '#/hooks/useOrgCredits'
 
-const ICONS = {
+const ICONS: Record<string, React.ComponentType<{ className?: string }>> = {
   Dashboard: LayoutDashboard,
+  'AI Demo': Sparkles,
   Organizations: Building2,
   Store: Coins,
   Billing: CreditCard,
   'API Keys': Key,
+  Admin: ShieldCheck,
 }
 
 function SidebarContent({ onNavigate }: { onNavigate?: () => void }) {
@@ -72,13 +76,18 @@ function SidebarContent({ onNavigate }: { onNavigate?: () => void }) {
 
   const { data: credits } = useOrgCredits(selectedOrgId ?? null)
 
-  const navItems = APP_NAV.map((item) => {
-    const href =
-      item.label === 'Billing' && selectedOrgId
-        ? `/orgs/${selectedOrgId}?tab=billing`
-        : item.href
-    return { ...item, href }
-  })
+  const isAdmin = user?.permissions?.includes('admin:access') ?? false
+
+  const navItems = [
+    ...APP_NAV.map((item) => {
+      const href =
+        item.label === 'Billing' && selectedOrgId
+          ? `/orgs/${selectedOrgId}?tab=billing`
+          : item.href
+      return { ...item, href }
+    }),
+    ...(isAdmin ? ADMIN_NAV.map((item) => ({ ...item, href: item.href })) : []),
+  ]
 
   // Determine if it's rendered within a desktop or a sheet (where isCollapsed is effectively false always)
   // But we use isCollapsed from context. For mobile sheet, the context isCollapsed doesn't affect the sheet width visually usually, but we will force isCollapsed to false for Sheet rendering if we need to.

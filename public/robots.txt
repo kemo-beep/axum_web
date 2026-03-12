@@ -2,4 +2,14 @@
 User-agent: *
 Allow: /
 
+# Private/authenticated areas
+Disallow: /dashboard
+Disallow: /profile
+Disallow: /billing
+Disallow: /api-keys
+Disallow: /admin
+Disallow: /invites
+Disallow: /store
+
+# Replace with your production domain before deployment
 Sitemap: https://example.com/sitemap.xml

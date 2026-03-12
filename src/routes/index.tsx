@@ -3,7 +3,6 @@ import { HomePage } from '#/components/pages/HomePage'
 import { createSeoMeta } from '#/lib/seo'
 
 export const Route = createFileRoute('/')({
-  ssr: false,
   head: () => {
     const { meta, links } = createSeoMeta({
       title: 'Home',

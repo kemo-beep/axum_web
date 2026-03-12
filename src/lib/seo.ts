@@ -37,7 +37,9 @@ export function createSeoMeta(options: SeoOptions = {}) {
 
   const fullTitle = title ? `${title} | ${SITE_NAME}` : SITE_NAME
   const url = `${SITE_URL.replace(/\/$/, '')}${path ? (path.startsWith('/') ? path : `/${path}`) : ''}`
-  const imageUrl = image?.startsWith('http') ? image : image ? `${SITE_URL}${image.startsWith('/') ? image : `/${image}`}` : undefined
+  const defaultImage = '/logo512.png'
+  const rawImage = image ?? defaultImage
+  const imageUrl = rawImage.startsWith('http') ? rawImage : `${SITE_URL}${rawImage.startsWith('/') ? rawImage : `/${rawImage}`}`
 
   const meta: Array<{ title?: string; name?: string; property?: string; content?: string }> = [
     { title: fullTitle },
@@ -52,12 +54,10 @@ export function createSeoMeta(options: SeoOptions = {}) {
     { name: 'twitter:description', content: description },
   ]
 
-  if (imageUrl) {
-    meta.push(
-      { property: 'og:image', content: imageUrl },
-      { name: 'twitter:image', content: imageUrl },
-    )
-  }
+  meta.push(
+    { property: 'og:image', content: imageUrl },
+    { name: 'twitter:image', content: imageUrl },
+  )
 
   if (noIndex) {
     meta.push({ name: 'robots', content: 'noindex, nofollow' })

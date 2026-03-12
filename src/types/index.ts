@@ -78,3 +78,35 @@ export interface AuthResponse {
   access_token: string
   token_type: string
 }
+
+// Admin dashboard types
+export interface JobStats {
+  enqueue: number
+  success: number
+  fail: number
+  dead_letter: number
+  last_latency_ms: number | null
+  latency_sample_count: number
+}
+
+export interface FeatureFlagItem {
+  name: string
+  org_id: string | null
+  enabled: boolean
+}
+
+export interface AdminUser {
+  id: string
+  email: string
+  created_at: string
+}
+
+export interface ListUsersResponse {
+  users: AdminUser[]
+  total: number
+}
+
+export interface ImpersonateResponse {
+  token: string
+  expires_in_secs: number
+}

@@ -25,6 +25,8 @@ import { Route as ChangelogRouteImport } from './routes/changelog'
 import { Route as CareersRouteImport } from './routes/careers'
 import { Route as BlogRouteImport } from './routes/blog'
 import { Route as ApiKeysRouteImport } from './routes/api-keys'
+import { Route as AiDemoRouteImport } from './routes/ai-demo'
+import { Route as AdminRouteImport } from './routes/admin'
 import { Route as AboutRouteImport } from './routes/about'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as OrgsIndexRouteImport } from './routes/orgs/index'
@@ -115,6 +117,16 @@ const ApiKeysRoute = ApiKeysRouteImport.update({
   path: '/api-keys',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AiDemoRoute = AiDemoRouteImport.update({
+  id: '/ai-demo',
+  path: '/ai-demo',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AdminRoute = AdminRouteImport.update({
+  id: '/admin',
+  path: '/admin',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AboutRoute = AboutRouteImport.update({
   id: '/about',
   path: '/about',
@@ -164,6 +176,8 @@ const BillingPlansRoute = BillingPlansRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
+  '/admin': typeof AdminRoute
+  '/ai-demo': typeof AiDemoRoute
   '/api-keys': typeof ApiKeysRoute
   '/blog': typeof BlogRouteWithChildren
   '/careers': typeof CareersRoute
@@ -191,6 +205,8 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
+  '/admin': typeof AdminRoute
+  '/ai-demo': typeof AiDemoRoute
   '/api-keys': typeof ApiKeysRoute
   '/careers': typeof CareersRoute
   '/changelog': typeof ChangelogRoute
@@ -218,6 +234,8 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
+  '/admin': typeof AdminRoute
+  '/ai-demo': typeof AiDemoRoute
   '/api-keys': typeof ApiKeysRoute
   '/blog': typeof BlogRouteWithChildren
   '/careers': typeof CareersRoute
@@ -247,6 +265,8 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/about'
+    | '/admin'
+    | '/ai-demo'
     | '/api-keys'
     | '/blog'
     | '/careers'
@@ -274,6 +294,8 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/about'
+    | '/admin'
+    | '/ai-demo'
     | '/api-keys'
     | '/careers'
     | '/changelog'
@@ -300,6 +322,8 @@ export interface FileRouteTypes {
     | '__root__'
     | '/'
     | '/about'
+    | '/admin'
+    | '/ai-demo'
     | '/api-keys'
     | '/blog'
     | '/careers'
@@ -328,6 +352,8 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AboutRoute: typeof AboutRoute
+  AdminRoute: typeof AdminRoute
+  AiDemoRoute: typeof AiDemoRoute
   ApiKeysRoute: typeof ApiKeysRoute
   BlogRoute: typeof BlogRouteWithChildren
   CareersRoute: typeof CareersRoute
@@ -465,6 +491,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiKeysRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/ai-demo': {
+      id: '/ai-demo'
+      path: '/ai-demo'
+      fullPath: '/ai-demo'
+      preLoaderRoute: typeof AiDemoRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/admin': {
+      id: '/admin'
+      path: '/admin'
+      fullPath: '/admin'
+      preLoaderRoute: typeof AdminRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/about': {
       id: '/about'
       path: '/about'
@@ -546,6 +586,8 @@ const BlogRouteWithChildren = BlogRoute._addFileChildren(BlogRouteChildren)
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AboutRoute: AboutRoute,
+  AdminRoute: AdminRoute,
+  AiDemoRoute: AiDemoRoute,
   ApiKeysRoute: ApiKeysRoute,
   BlogRoute: BlogRouteWithChildren,
   CareersRoute: CareersRoute,

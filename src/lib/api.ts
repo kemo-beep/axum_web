@@ -19,6 +19,34 @@ export function setApiAuth(config: {
   onUnauthorized = config.onUnauthorized
 }
 
+export function getApiHeaders(_method?: string): Record<string, string> {
+  const headers: Record<string, string> = {
+    'Content-Type': 'application/json',
+  }
+  const token = getToken?.() ?? null
+  if (token) {
+    headers['Authorization'] = `Bearer ${token}`
+  }
+  return headers
+}
+
+export async function apiFetchStream(
+  path: string,
+  init: RequestInit = {},
+): Promise<Response> {
+  const url = path.startsWith('http') ? path : `${API_BASE}${path}`
+  const headers: Record<string, string> = {
+    ...getApiHeaders(init.method),
+    ...(init.headers as Record<string, string>),
+  }
+  const res = await fetch(url, { ...init, headers })
+  if (res.status === 401) {
+    onUnauthorized?.()
+    throw { message: 'Unauthorized', status: 401 } as ApiError
+  }
+  return res
+}
+
 async function handleResponse<T>(res: Response): Promise<T> {
   if (res.status === 401) {
     onUnauthorized?.()

@@ -11,12 +11,14 @@ export const LANDING_PATHS = [
 /** Path prefixes/patterns for the dashboard layout (sidebar). */
 const APP_PATH_PREFIXES = [
   '/dashboard',
+  '/ai-demo',
   '/profile',
   '/orgs',
   '/store',
   '/billing',
   '/api-keys',
   '/invites',
+  '/admin',
 ] as const
 
 export function isLandingPath(pathname: string): boolean {
